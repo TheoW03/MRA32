@@ -35,7 +35,7 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
     // emulate(parse(lex(readFile("test.s"))));
-    // printList(lex(readFile("test.s")));
+    printList(lex(readFile("test.s")));
     parse(lex(readFile("test.s")));
     return 0;
 }

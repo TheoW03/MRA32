@@ -20,9 +20,12 @@ struct conditions : public Instructions
 };
 struct AddInstruct : public Instructions
 {
+    int condition;
+    int I;
+    int S;
+    int Rn;
     int Rd;
-    int R1;
-    int R2;
+    int OP2;
 };
 #endif
 vector<Instructions *> parse(vector<Tokens> tokens);

@@ -1,1 +1,2 @@
-ADD R3, R1, R2   
+ADD R3, R1, R2
+MOV R1, 0

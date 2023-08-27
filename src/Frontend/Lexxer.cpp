@@ -35,6 +35,7 @@ vector<string> readFile(string file)
         // cout << line + "\n";
         vec.push_back(line);
     }
+
     infile.close();
     return vec;
 }
@@ -67,11 +68,16 @@ vector<Tokens> lex(vector<string> lines)
         {
             char current = line.at(i2);
             string str(1, current);
+            if ((int)current == 13)
+            {
+                continue;
+            }
             if (current != ' ' && current != '\t' && current != '\0')
             {
 
                 if (state == 1)
                 {
+
                     if (regex_search(str, myMatch, numReg))
                     {
                         stringBuffer += str;
@@ -85,12 +91,11 @@ vector<Tokens> lex(vector<string> lines)
                             token.id = type::NUMBER;
                             a.push_back(token);
                             stringBuffer = "";
-                            stringBuffer += str;
-                            token.buffer = stringBuffer;
-                            token.id = type::COMMA;
-                            a.push_back(token);
+                            Tokens commaToken; // Create a separate token for the comma
 
-                            stringBuffer = "";
+                            commaToken.buffer = str;
+                            commaToken.id = type::COMMA;
+                            a.push_back(token);
                             state = 2;
                         }
                     }
@@ -111,11 +116,10 @@ vector<Tokens> lex(vector<string> lines)
                             token.id = (instructions.find(stringBuffer) != instructions.end()) ? type::INSTRUCTION : type::REGISTER;
                             a.push_back(token);
                             stringBuffer = "";
-                            stringBuffer += str;
-                            token.buffer = stringBuffer;
-                            token.id = type::COMMA;
-                            a.push_back(token);
-                            stringBuffer = "";
+                            Tokens commaToken; // Create a separate token for the comma
+                            commaToken.buffer = str;
+                            commaToken.id = type::COMMA;
+                            a.push_back(commaToken);
                             state = 1;
                         }
                     }
@@ -127,7 +131,7 @@ vector<Tokens> lex(vector<string> lines)
             }
             else
             {
-                if (!stringBuffer.empty() && stringBuffer.size() != 0 && stringBuffer != "")
+                if (stringBuffer != "")
                 {
 
                     Tokens token;
@@ -137,17 +141,38 @@ vector<Tokens> lex(vector<string> lines)
                                                                                                                                     : type::REGISTER;
                     a.push_back(token);
                     stringBuffer = "";
+
                     state = 1;
                 }
             }
+            for (char c : str)
+            {
+                int asciiValue = static_cast<int>(c);
+                if (asciiValue == 13)
+                {
+                    std::cout << "Character: " << c << " | ASCII value: " << asciiValue << std::endl;
+                    exit(0);
+                }
+            }
         }
-        if (line.length() != 0)
+
+        if (!stringBuffer.empty() && stringBuffer.size() != 0 && stringBuffer != "")
         {
+
             Tokens token;
-            token.buffer = ";";
-            token.id = type::END_OF_LINE;
+            token.buffer = stringBuffer;
+            token.id = (instructions.find(stringBuffer) != instructions.end())                                              ? type::INSTRUCTION
+                       : (regex_search(stringBuffer, myMatch, numReg) && !regex_search(stringBuffer, myMatch, AlphaBetReg)) ? type::NUMBER
+                                                                                                                            : type::REGISTER;
             a.push_back(token);
+            stringBuffer = "";
+            state = 1;
         }
+
+        Tokens token;
+        token.buffer = ";";
+        token.id = type::END_OF_LINE;
+        a.push_back(token);
     }
     Tokens token;
     token.buffer = "";

@@ -13,20 +13,14 @@ using namespace std;
 struct Instructions
 {
     uint16_t opcode;
-    virtual ~Instructions();
-};
-
-struct conditions : public Instructions
-{
+    int condition;
+    int I;
+    int S;
+    int Rn;
     int Rd;
-    int Rx;
-};
-struct AddInstruct : public Instructions
-{
-    int Rd;
-    int OP1;
     int OP2;
 };
+
 Tokens *current;
 Tokens *matchAndRemove(vector<Tokens> &tokens, type typeT)
 {
@@ -38,6 +32,7 @@ Tokens *matchAndRemove(vector<Tokens> &tokens, type typeT)
     {
 
         Tokens *t = new Tokens(tokens[0]);
+        current = new Tokens;
         current = t;
         tokens.erase(tokens.begin());
         return t;
@@ -51,19 +46,53 @@ int handleRegisters(Tokens *reg)
     string substring = reg->buffer.substr(1, reg->buffer.length());
     return stoi(substring);
 }
-Instructions *handleAdd(vector<Tokens> &tokens)
+
+Instructions *handle2Operands(vector<Tokens> &tokens, uint16_t opCode)
 {
-    AddInstruct *a = new AddInstruct;
-    a->opcode = 0x4;
-    cout << a->opcode << endl;
-    matchAndRemove(tokens, type::COMMA);
+    Instructions *a = new Instructions;
+    a->condition = 1;
+    a->opcode = opCode;
+    a->S = 0;
     a->Rd = handleRegisters(matchAndRemove(tokens, type::REGISTER));
     matchAndRemove(tokens, type::COMMA);
-    a->OP1 = handleRegisters(matchAndRemove(tokens, type::REGISTER));
-    matchAndRemove(tokens, type::COMMA); //write abstraction over this
-    a->OP1 = handleRegisters(matchAndRemove(tokens, type::REGISTER));
+    a->Rn = handleRegisters(matchAndRemove(tokens, type::REGISTER));
+    matchAndRemove(tokens, type::COMMA); // write abstraction over this
+    if (matchAndRemove(tokens, type::NUMBER) != nullptr)
+    {
+        a->I = 1;
+        a->OP2 = stoi(current->buffer);
+    }
+    else
+    {
+        a->I = 0;
+        a->OP2 = handleRegisters(matchAndRemove(tokens, type::REGISTER));
+    }
 
     return a;
+}
+Instructions *handle1Operand(vector<Tokens> &tokens, uint16_t opCode)
+{
+    cout << "1 operand" << endl;
+    Instructions *a = new Instructions;
+    a->condition = 1;
+    a->opcode = opCode;
+    a->S = 1;
+    matchAndRemove(tokens, type::COMMA);
+
+    a->Rd = handleRegisters(matchAndRemove(tokens, type::REGISTER));
+    matchAndRemove(tokens, type::COMMA);
+
+    if (matchAndRemove(tokens, type::NUMBER) != nullptr)
+    {
+        a->I = 1;
+        a->OP2 = stoi(current->buffer);
+        cout << "reg" << endl;
+    }
+    else
+    {
+        a->I = 0;
+        a->OP2 = handleRegisters(matchAndRemove(tokens, type::REGISTER));
+    }
 }
 void RemoveEOLS(vector<Tokens> &list)
 {
@@ -83,27 +112,37 @@ vector<Instructions *> parse(vector<Tokens> tokens)
 
     while (matchAndRemove(tokens, type::END_OF_PROGRAM) == nullptr)
     {
-        if (tokens.empty())
-        {
-            return a;
-        }
+
         RemoveEOLS(tokens);
 
         Tokens *Instructiona = matchAndRemove(tokens, type::INSTRUCTION);
+
+        RemoveEOLS(tokens);
+
         if (Instructiona != nullptr)
         {
             if (Instructiona->buffer == "ADD")
             {
-                a.push_back(handleAdd(tokens));
+                cout << "ADD" << endl;
+                a.push_back(handle2Operands(tokens, 0x4));
             }
             else if (Instructiona->buffer == "SUB")
             {
+                cout << "SUB" << endl;
+
+                a.push_back(handle2Operands(tokens, 0x2));
             }
             else if (Instructiona->buffer == "MUL")
             {
+                cout << "MUL" << endl;
+
+                a.push_back(handle2Operands(tokens, 0x9));
             }
             else if (Instructiona->buffer == "MOV")
             {
+                cout << "MOV" << endl;
+
+                a.push_back(handle1Operand(tokens, 0x0));
             }
         }
         RemoveEOLS(tokens);
