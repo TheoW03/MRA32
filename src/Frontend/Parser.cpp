@@ -80,19 +80,20 @@ Instructions *handle1Operand(vector<Tokens> &tokens, uint16_t opCode)
     matchAndRemove(tokens, type::COMMA);
 
     a->Rd = handleRegisters(matchAndRemove(tokens, type::REGISTER));
+    a->Rn = a->Rd;
     matchAndRemove(tokens, type::COMMA);
 
     if (matchAndRemove(tokens, type::NUMBER) != nullptr)
     {
         a->I = 1;
         a->OP2 = stoi(current->buffer);
-        cout << "reg" << endl;
     }
     else
     {
         a->I = 0;
         a->OP2 = handleRegisters(matchAndRemove(tokens, type::REGISTER));
     }
+    return a;
 }
 void RemoveEOLS(vector<Tokens> &list)
 {
@@ -123,24 +124,20 @@ vector<Instructions *> parse(vector<Tokens> tokens)
         {
             if (Instructiona->buffer == "ADD")
             {
-                cout << "ADD" << endl;
                 a.push_back(handle2Operands(tokens, 0x4));
             }
             else if (Instructiona->buffer == "SUB")
             {
-                cout << "SUB" << endl;
 
                 a.push_back(handle2Operands(tokens, 0x2));
             }
             else if (Instructiona->buffer == "MUL")
             {
-                cout << "MUL" << endl;
 
                 a.push_back(handle2Operands(tokens, 0x9));
             }
             else if (Instructiona->buffer == "MOV")
             {
-                cout << "MOV" << endl;
 
                 a.push_back(handle1Operand(tokens, 0x0));
             }

@@ -1,2 +1,3 @@
-ADD R3, R1, R2
-MOV R1, 0
+MOV R1, 2
+MOV R2, 3
+ADD R3, R2, 100

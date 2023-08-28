@@ -145,15 +145,7 @@ vector<Tokens> lex(vector<string> lines)
                     state = 1;
                 }
             }
-            for (char c : str)
-            {
-                int asciiValue = static_cast<int>(c);
-                if (asciiValue == 13)
-                {
-                    std::cout << "Character: " << c << " | ASCII value: " << asciiValue << std::endl;
-                    exit(0);
-                }
-            }
+            
         }
 
         if (!stringBuffer.empty() && stringBuffer.size() != 0 && stringBuffer != "")
