@@ -72,7 +72,6 @@ Instructions *handle2Operands(vector<Tokens> &tokens, uint16_t opCode)
 }
 Instructions *handle1Operand(vector<Tokens> &tokens, uint16_t opCode)
 {
-    cout << "1 operand" << endl;
     Instructions *a = new Instructions;
     a->condition = 1;
     a->opcode = opCode;

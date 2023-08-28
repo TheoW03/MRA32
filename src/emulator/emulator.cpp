@@ -17,7 +17,7 @@ bool instanceof (T * ptr)
 
 uint32_t handle_with_rgsiter(Instructions *instruction)
 {
-    return (instruction->opcode << 21) | (instruction->Rd << 12) | (instruction->OP2 << 8) | instruction->Rn;
+    return (instruction->opcode << 21) | (instruction->I << 25) | (instruction->Rd << 12) | (instruction->OP2 << 8) | instruction->Rn;
 }
 uint32_t handle_with_number(Instructions *instruction)
 {
@@ -32,13 +32,11 @@ vector<uint32_t> encode(vector<Instructions *> InstructionsList)
         {
             uint32_t instruction = handle_with_number(InstructionsList[i]);
             encoded_instructions.push_back(instruction);
-            cout << std::hex << instruction << endl;
         }
         else
         {
             uint32_t instruction = handle_with_number(InstructionsList[i]);
             encoded_instructions.push_back(instruction);
-            cout << std::hex << instruction << endl;
         }
     }
     return encoded_instructions;
@@ -46,4 +44,13 @@ vector<uint32_t> encode(vector<Instructions *> InstructionsList)
 void emulate(vector<Instructions *> InstructionsList)
 {
     vector<uint32_t> encodedInstrtions = encode(InstructionsList);
+    for (int i = 0; i < encodedInstrtions.size(); i++)
+    {
+        uint32_t instruction = encodedInstrtions[i];
+        uint8_t opcode = (instruction >> 21) & 0x0F;
+        uint8_t rd = (instruction >> 12) & 0x0F;
+        uint8_t rn = (instruction >> 16) & 0x0F;
+        uint32_t iBit = (instruction >> 25) & 1;
+        uint16_t immediate = instruction & 0xFFF;
+    }
 }

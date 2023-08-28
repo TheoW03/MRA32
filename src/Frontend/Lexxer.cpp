@@ -62,11 +62,33 @@ vector<Tokens> lex(vector<string> lines)
 
         regex numReg("[0-9]");         // num regex
         regex AlphaBetReg("[a-zA-Z]"); // num regex
-
+        int comment = 0;
         std::smatch myMatch;
         for (int i2 = 0; i2 < line.length(); i2++)
         {
+            if (comment == 1)
+            {
+                continue;
+            }
+
             char current = line.at(i2);
+            if (current == '#')
+            {
+                if (!stringBuffer.empty() && stringBuffer.size() != 0 && stringBuffer != "")
+                {
+
+                    Tokens token;
+                    token.buffer = stringBuffer;
+                    token.id = (instructions.find(stringBuffer) != instructions.end())                                              ? type::INSTRUCTION
+                               : (regex_search(stringBuffer, myMatch, numReg) && !regex_search(stringBuffer, myMatch, AlphaBetReg)) ? type::NUMBER
+                                                                                                                                    : type::REGISTER;
+                    a.push_back(token);
+                    stringBuffer = "";
+                    state = 1;
+                }
+                comment = 1;
+                continue;
+            }
             string str(1, current);
             if ((int)current == 13)
             {
@@ -145,7 +167,6 @@ vector<Tokens> lex(vector<string> lines)
                     state = 1;
                 }
             }
-            
         }
 
         if (!stringBuffer.empty() && stringBuffer.size() != 0 && stringBuffer != "")
