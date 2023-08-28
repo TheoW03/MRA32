@@ -135,10 +135,14 @@ vector<Instructions *> parse(vector<Tokens> tokens)
 
                 a.push_back(handle2Operands(tokens, 0x9));
             }
+            else if (Instructiona->buffer == "AND")
+            {
+                a.push_back(handle2Operands(tokens, 0x0));
+            }
             else if (Instructiona->buffer == "MOV")
             {
 
-                a.push_back(handle1Operand(tokens, 0x0));
+                a.push_back(handle1Operand(tokens, 0xD));
             }
         }
         RemoveEOLS(tokens);

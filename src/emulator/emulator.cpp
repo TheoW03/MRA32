@@ -32,11 +32,13 @@ vector<uint32_t> encode(vector<Instructions *> InstructionsList)
         {
             uint32_t instruction = handle_with_number(InstructionsList[i]);
             encoded_instructions.push_back(instruction);
+            cout << instruction << endl;
         }
         else
         {
             uint32_t instruction = handle_with_number(InstructionsList[i]);
             encoded_instructions.push_back(instruction);
+            cout << instruction << endl;
         }
     }
     return encoded_instructions;
