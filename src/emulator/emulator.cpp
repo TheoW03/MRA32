@@ -21,11 +21,15 @@ struct EncodedInstructions
 };
 uint32_t handle_with_rgsiter(Instructions *instruction)
 {
-    return (instruction->opcode << 21) | (instruction->I << 25) | (instruction->Rd << 12) | (instruction->OP2 << 8) | instruction->Rn;
+    return (instruction->I << 25) | (instruction->opcode << 21) | (instruction->Rd << 12) | (instruction->OP2 << 8) | instruction->Rn;
 }
 uint32_t handle_with_number(Instructions *instruction)
 {
-    return (instruction->opcode << 21) | (instruction->Rn << 16) | (instruction->Rd << 12) | instruction->OP2;
+    if (instruction == nullptr)
+    {
+        cout << "null" << endl;
+    }
+    return (instruction->I << 25) | (instruction->opcode << 21) | (instruction->Rn << 16) | (instruction->Rd << 12) | instruction->OP2;
 }
 vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
 {
@@ -33,11 +37,11 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
 
     for (int i = 0; i < InstructionsList.size(); i++)
     {
-        EncodedInstructions *ei = new EncodedInstructions;
         if (InstructionsList[i]->instructionType == InstructionType::DATA_PROCESSING)
         {
             if (InstructionsList[i]->I == 1)
             {
+                EncodedInstructions *ei = new EncodedInstructions;
 
                 uint32_t instruction = handle_with_number(InstructionsList[i]);
                 ei->encodedInstruction = instruction;
@@ -46,6 +50,8 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
             }
             else
             {
+                EncodedInstructions *ei = new EncodedInstructions;
+
                 uint32_t instruction = handle_with_number(InstructionsList[i]);
                 ei->encodedInstruction = instruction;
                 ei->instructionType = InstructionType::DATA_PROCESSING;
@@ -58,20 +64,73 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
 void emulate(vector<Instructions *> InstructionsList)
 {
     vector<EncodedInstructions *> encodedInstrtions = encode(InstructionsList);
+    uint32_t registersList[10];
+    for (int i = 0; i < 10; i++)
+    {
+        registersList[i] = 0;
+    }
     for (int i = 0; i < encodedInstrtions.size(); i++)
     {
+
+#pragma region DATA_PROCESSING
         if (encodedInstrtions[i]->instructionType == InstructionType::DATA_PROCESSING)
         {
+
             uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
-            uint8_t opcode = (instruction >> 21) & 0x0F;
-            uint8_t rd = (instruction >> 12) & 0x0F;
-            uint8_t rn = (instruction >> 16) & 0x0F;
             uint32_t iBit = (instruction >> 25) & 1;
-            uint16_t immediate = instruction & 0xFFF;
-            if (opcode == 0x4)
+            uint32_t opcode = (instruction >> 21) & 0x0F;
+            uint32_t rd = (instruction >> 12) & 0x0F;
+            uint32_t rn = (instruction >> 16) & 0x0F;
+            uint32_t immediate = instruction & 0xFFF;
+            if (opcode == 4) // ADD
             {
-                // perform the add operator
+                if (iBit == 1)
+                {
+                    registersList[rd] = registersList[rn] + immediate;
+                }
+                else
+                {
+                    registersList[rd] = registersList[rn] + registersList[immediate];
+                }
+            }
+            else if (opcode == 2) // SUB
+            {
+                if (iBit == 1)
+                {
+                    registersList[rd] = registersList[rn] - immediate;
+                }
+                else
+                {
+                    registersList[rd] = registersList[rn] - registersList[immediate];
+                }
+            }
+            else if (opcode == 9) // MUL
+            {
+                if (iBit == 1)
+                {
+                    registersList[rd] = registersList[rn] * immediate;
+                }
+                else
+                {
+                    registersList[rd] = registersList[rn] * registersList[immediate];
+                }
+            }
+            else if (opcode == 13) // MOV
+            {
+                if (iBit == 1)
+                {
+                    registersList[rd] = immediate;
+                }
+                else
+                {
+                    registersList[rd] = registersList[immediate];
+                }
             }
         }
+#pragma endregion
+    }
+    for (int i = 0; i < 10; i++)
+    {
+        cout << "R" << i << " value: " << registersList[i] << endl;
     }
 }

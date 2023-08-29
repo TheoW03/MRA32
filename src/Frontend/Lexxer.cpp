@@ -70,7 +70,6 @@ vector<Tokens> lex(vector<string> lines)
             {
                 continue;
             }
-
             char current = line.at(i2);
             if (current == '#')
             {

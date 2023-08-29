@@ -78,14 +78,22 @@ Instructions *handle2Operands(vector<Tokens> &tokens, uint16_t opCode)
 }
 Instructions *handle1Operand(vector<Tokens> &tokens, uint16_t opCode)
 {
+
     Instructions *a = new Instructions;
+
+    if (a == nullptr)
+    {
+        cout << " a== null ptr o.O " << endl;
+    }
     a->condition = 1;
+
     a->opcode = opCode;
     a->S = 1;
-    matchAndRemove(tokens, type::COMMA);
 
     a->Rd = handleRegisters(matchAndRemove(tokens, type::REGISTER));
+
     a->Rn = a->Rd;
+
     matchAndRemove(tokens, type::COMMA);
 
     if (matchAndRemove(tokens, type::NUMBER) != nullptr)
@@ -155,10 +163,15 @@ vector<Instructions *> parse(vector<Tokens> tokens)
             else if (Instructiona->buffer == "MOV")
             {
 
-                Instructions *in = handle2Operands(tokens, 0xD);
+                Instructions *in = handle1Operand(tokens, 0xD);
                 in->instructionType = InstructionType::DATA_PROCESSING;
                 a.push_back(in);
-            }//..so on for every possible instruction
+            } //..so on for every possible instruction
+        }
+        else
+        {
+            cout << "null ptr" << endl;
+            cout << " " << endl;
         }
         RemoveEOLS(tokens);
     }
