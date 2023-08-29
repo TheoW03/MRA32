@@ -10,6 +10,11 @@
 
 using namespace std;
 
+enum class InstructionType
+{
+    CONDITIONAL,
+    DATA_PROCESSING
+};
 struct Instructions
 {
     uint16_t opcode;
@@ -19,6 +24,7 @@ struct Instructions
     int Rn;
     int Rd;
     int OP2;
+    InstructionType instructionType;
 };
 
 Tokens *current;
@@ -123,27 +129,36 @@ vector<Instructions *> parse(vector<Tokens> tokens)
         {
             if (Instructiona->buffer == "ADD")
             {
-                a.push_back(handle2Operands(tokens, 0x4));
+                Instructions *in = handle2Operands(tokens, 0x4);
+                in->instructionType = InstructionType::DATA_PROCESSING;
+                a.push_back(in);
             }
             else if (Instructiona->buffer == "SUB")
             {
-
-                a.push_back(handle2Operands(tokens, 0x2));
+                Instructions *in = handle2Operands(tokens, 0x2);
+                in->instructionType = InstructionType::DATA_PROCESSING;
+                a.push_back(in);
             }
             else if (Instructiona->buffer == "MUL")
             {
 
-                a.push_back(handle2Operands(tokens, 0x9));
+                Instructions *in = handle2Operands(tokens, 0x9);
+                in->instructionType = InstructionType::DATA_PROCESSING;
+                a.push_back(in);
             }
             else if (Instructiona->buffer == "AND")
             {
-                a.push_back(handle2Operands(tokens, 0x0));
+                Instructions *in = handle2Operands(tokens, 0x0);
+                in->instructionType = InstructionType::DATA_PROCESSING;
+                a.push_back(in);
             }
             else if (Instructiona->buffer == "MOV")
             {
 
-                a.push_back(handle1Operand(tokens, 0xD));
-            }
+                Instructions *in = handle2Operands(tokens, 0xD);
+                in->instructionType = InstructionType::DATA_PROCESSING;
+                a.push_back(in);
+            }//..so on for every possible instruction
         }
         RemoveEOLS(tokens);
     }

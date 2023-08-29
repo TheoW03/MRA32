@@ -6,6 +6,15 @@
 
 using namespace std;
 
+#ifndef INSTRTUCTIPN_TYPE_H
+#define INSTRTUCTIPN_TYPE_H
+enum class InstructionType
+{
+    CONDITIONAL,
+    DATA_PROCESSING
+};
+#endif
+
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
@@ -18,6 +27,7 @@ struct Instructions
     int Rn;
     int Rd;
     int OP2;
+    InstructionType instructionType;
 };
 
 #endif
