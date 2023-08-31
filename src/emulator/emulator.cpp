@@ -37,6 +37,8 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
 
     for (int i = 0; i < InstructionsList.size(); i++)
     {
+
+        #pragma region DATA_PROCESSING encoding
         if (InstructionsList[i]->instructionType == InstructionType::DATA_PROCESSING)
         {
             if (InstructionsList[i]->I == 1)
@@ -58,6 +60,7 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
                 encoded_instructions.push_back(ei);
             }
         }
+        #pragma endregion
     }
     return encoded_instructions;
 }
@@ -72,7 +75,7 @@ void emulate(vector<Instructions *> InstructionsList)
     for (int i = 0; i < encodedInstrtions.size(); i++)
     {
 
-#pragma region DATA_PROCESSING
+#pragma region DATA_PROCESSING decoding
         if (encodedInstrtions[i]->instructionType == InstructionType::DATA_PROCESSING)
         {
 
@@ -128,6 +131,7 @@ void emulate(vector<Instructions *> InstructionsList)
             }
         }
 #pragma endregion
+    
     }
     for (int i = 0; i < 10; i++)
     {
