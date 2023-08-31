@@ -7,7 +7,13 @@
 #include "../../src/Frontend/Parser.h"
 
 using namespace std;
-
+enum class dataProcessingInstructions
+{
+    ADD,
+    SUB,
+    MUL,
+    MOV
+};
 int PC = 0;
 template <typename Base, typename T>
 bool instanceof (T * ptr)
@@ -38,7 +44,7 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
     for (int i = 0; i < InstructionsList.size(); i++)
     {
 
-        #pragma region DATA_PROCESSING encoding
+#pragma region DATA_PROCESSING encoding
         if (InstructionsList[i]->instructionType == InstructionType::DATA_PROCESSING)
         {
             if (InstructionsList[i]->I == 1)
@@ -60,7 +66,7 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
                 encoded_instructions.push_back(ei);
             }
         }
-        #pragma endregion
+#pragma endregion
     }
     return encoded_instructions;
 }
@@ -78,6 +84,11 @@ void emulate(vector<Instructions *> InstructionsList)
 #pragma region DATA_PROCESSING decoding
         if (encodedInstrtions[i]->instructionType == InstructionType::DATA_PROCESSING)
         {
+            map<int, dataProcessingInstructions> instructionMap;
+            instructionMap[4] = dataProcessingInstructions::ADD;
+            instructionMap[2] = dataProcessingInstructions::SUB;
+            instructionMap[9] = dataProcessingInstructions::MUL;
+            instructionMap[13] = dataProcessingInstructions::MOV;
 
             uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
             uint32_t iBit = (instruction >> 25) & 1;
@@ -85,7 +96,8 @@ void emulate(vector<Instructions *> InstructionsList)
             uint32_t rd = (instruction >> 12) & 0x0F;
             uint32_t rn = (instruction >> 16) & 0x0F;
             uint32_t immediate = instruction & 0xFFF;
-            if (opcode == 4) // ADD
+            dataProcessingInstructions instructionTypes = instructionMap[opcode];
+            if (instructionTypes == dataProcessingInstructions::ADD) // ADD
             {
                 if (iBit == 1)
                 {
@@ -96,7 +108,7 @@ void emulate(vector<Instructions *> InstructionsList)
                     registersList[rd] = registersList[rn] + registersList[immediate];
                 }
             }
-            else if (opcode == 2) // SUB
+            else if (instructionTypes == dataProcessingInstructions::SUB) // SUB
             {
                 if (iBit == 1)
                 {
@@ -107,7 +119,7 @@ void emulate(vector<Instructions *> InstructionsList)
                     registersList[rd] = registersList[rn] - registersList[immediate];
                 }
             }
-            else if (opcode == 9) // MUL
+            else if (instructionTypes == dataProcessingInstructions::MUL) // MUL
             {
                 if (iBit == 1)
                 {
@@ -118,7 +130,7 @@ void emulate(vector<Instructions *> InstructionsList)
                     registersList[rd] = registersList[rn] * registersList[immediate];
                 }
             }
-            else if (opcode == 13) // MOV
+            else if (instructionTypes == dataProcessingInstructions::MOV) // MOV
             {
                 if (iBit == 1)
                 {

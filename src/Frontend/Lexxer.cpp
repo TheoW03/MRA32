@@ -53,6 +53,7 @@ vector<Tokens> lex(vector<string> lines)
     instructions["MOV"] = type::INSTRUCTION;
 
     instructions["OR"] = type::INSTRUCTION;
+    instructions["B"] = type::INSTRUCTION;
 
     for (int i = 0; i < lines.size(); i++)
     {

@@ -3,5 +3,3 @@ MOV R3, 1
 ADD R1,R2, R3 
 MOV R2, 2
 ADD R0,R1, R2 
-
-
