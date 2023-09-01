@@ -15,7 +15,8 @@ enum class type
     NUMBER,
     COMMA,
     END_OF_LINE,
-    END_OF_PROGRAM
+    END_OF_PROGRAM,
+    WORD
 
 };
 struct Tokens
@@ -63,6 +64,8 @@ vector<Tokens> lex(vector<string> lines)
 
         regex numReg("[0-9]");         // num regex
         regex AlphaBetReg("[a-zA-Z]"); // num regex
+        regex regusterReg("R[0-9]"); // num regex
+
         int comment = 0;
         std::smatch myMatch;
         for (int i2 = 0; i2 < line.length(); i2++)

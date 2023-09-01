@@ -167,6 +167,10 @@ vector<Instructions *> parse(vector<Tokens> tokens)
                 in->instructionType = InstructionType::DATA_PROCESSING;
                 a.push_back(in);
             } //..so on for every possible instruction
+            else if (Instructiona->buffer == "B")
+            {
+                
+            }
         }
         else
         {

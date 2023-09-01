@@ -25,16 +25,10 @@ struct EncodedInstructions
     uint32_t encodedInstruction;
     InstructionType instructionType;
 };
-uint32_t handle_with_rgsiter(Instructions *instruction)
+
+uint32_t handle_data_processing(Instructions *instruction)
 {
-    return (instruction->I << 25) | (instruction->opcode << 21) | (instruction->Rd << 12) | (instruction->OP2 << 8) | instruction->Rn;
-}
-uint32_t handle_with_number(Instructions *instruction)
-{
-    if (instruction == nullptr)
-    {
-        cout << "null" << endl;
-    }
+
     return (instruction->I << 25) | (instruction->opcode << 21) | (instruction->Rn << 16) | (instruction->Rd << 12) | instruction->OP2;
 }
 vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
@@ -47,24 +41,13 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
 #pragma region DATA_PROCESSING encoding
         if (InstructionsList[i]->instructionType == InstructionType::DATA_PROCESSING)
         {
-            if (InstructionsList[i]->I == 1)
-            {
-                EncodedInstructions *ei = new EncodedInstructions;
+            EncodedInstructions *ei = new EncodedInstructions;
 
-                uint32_t instruction = handle_with_number(InstructionsList[i]);
-                ei->encodedInstruction = instruction;
-                ei->instructionType = InstructionType::DATA_PROCESSING;
-                encoded_instructions.push_back(ei);
-            }
-            else
-            {
-                EncodedInstructions *ei = new EncodedInstructions;
-
-                uint32_t instruction = handle_with_number(InstructionsList[i]);
-                ei->encodedInstruction = instruction;
-                ei->instructionType = InstructionType::DATA_PROCESSING;
-                encoded_instructions.push_back(ei);
-            }
+            uint32_t instruction = handle_data_processing(InstructionsList[i]);
+            ei->encodedInstruction = instruction;
+            ei->instructionType = InstructionType::DATA_PROCESSING;
+            encoded_instructions.push_back(ei);
+        
         }
 #pragma endregion
     }
@@ -84,11 +67,12 @@ void emulate(vector<Instructions *> InstructionsList)
 #pragma region DATA_PROCESSING decoding
         if (encodedInstrtions[i]->instructionType == InstructionType::DATA_PROCESSING)
         {
+
             map<int, dataProcessingInstructions> instructionMap;
-            instructionMap[4] = dataProcessingInstructions::ADD;
-            instructionMap[2] = dataProcessingInstructions::SUB;
-            instructionMap[9] = dataProcessingInstructions::MUL;
-            instructionMap[13] = dataProcessingInstructions::MOV;
+            instructionMap[0x4] = dataProcessingInstructions::ADD;
+            instructionMap[0x2] = dataProcessingInstructions::SUB;
+            instructionMap[0x9] = dataProcessingInstructions::MUL;
+            instructionMap[0xD] = dataProcessingInstructions::MOV;
 
             uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
             uint32_t iBit = (instruction >> 25) & 1;
@@ -96,6 +80,7 @@ void emulate(vector<Instructions *> InstructionsList)
             uint32_t rd = (instruction >> 12) & 0x0F;
             uint32_t rn = (instruction >> 16) & 0x0F;
             uint32_t immediate = instruction & 0xFFF;
+
             dataProcessingInstructions instructionTypes = instructionMap[opcode];
             if (instructionTypes == dataProcessingInstructions::ADD) // ADD
             {
@@ -143,7 +128,6 @@ void emulate(vector<Instructions *> InstructionsList)
             }
         }
 #pragma endregion
-    
     }
     for (int i = 0; i < 10; i++)
     {
