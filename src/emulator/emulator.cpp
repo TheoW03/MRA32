@@ -47,7 +47,6 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
             ei->encodedInstruction = instruction;
             ei->instructionType = InstructionType::DATA_PROCESSING;
             encoded_instructions.push_back(ei);
-        
         }
 #pragma endregion
     }
@@ -56,8 +55,8 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
 void emulate(vector<Instructions *> InstructionsList)
 {
     vector<EncodedInstructions *> encodedInstrtions = encode(InstructionsList);
-    uint32_t registersList[10];
-    for (int i = 0; i < 10; i++)
+    uint32_t registersList[16];
+    for (int i = 0; i < 16; i++)
     {
         registersList[i] = 0;
     }
@@ -80,8 +79,13 @@ void emulate(vector<Instructions *> InstructionsList)
             uint32_t rd = (instruction >> 12) & 0x0F;
             uint32_t rn = (instruction >> 16) & 0x0F;
             uint32_t immediate = instruction & 0xFFF;
+            registersList[15] += 4;
 
             dataProcessingInstructions instructionTypes = instructionMap[opcode];
+            if (rd > 12)
+            {
+                return;
+            }
             if (instructionTypes == dataProcessingInstructions::ADD) // ADD
             {
                 if (iBit == 1)
@@ -117,6 +121,7 @@ void emulate(vector<Instructions *> InstructionsList)
             }
             else if (instructionTypes == dataProcessingInstructions::MOV) // MOV
             {
+
                 if (iBit == 1)
                 {
                     registersList[rd] = immediate;
@@ -129,7 +134,7 @@ void emulate(vector<Instructions *> InstructionsList)
         }
 #pragma endregion
     }
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 16; i++)
     {
         cout << "R" << i << " value: " << registersList[i] << endl;
     }
