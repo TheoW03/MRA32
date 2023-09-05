@@ -11,7 +11,8 @@ using namespace std;
 enum class InstructionType
 {
     CONDITIONAL,
-    DATA_PROCESSING
+    DATA_PROCESSING,
+    MULTIPLY
 };
 #endif
 
@@ -20,6 +21,10 @@ enum class InstructionType
 
 struct Instructions
 {
+    virtual ~Instructions();
+};
+struct DataProcessing : public Instructions
+{
     uint16_t opcode;
     int condition;
     int I;
@@ -27,7 +32,14 @@ struct Instructions
     int Rn;
     int Rd;
     int OP2;
-    InstructionType instructionType;
+};
+struct Multiply : public Instructions
+{
+    int condition;
+    int A;
+    int Rn;
+    int Rd;
+    int Rm;
 };
 
 #endif

@@ -1,3 +1,4 @@
 MOV R2, 10
 MOV R3, 1
 ADD R1, R2, R3
+MUL R1, R2, R3

@@ -50,6 +50,8 @@ vector<Tokens> lex(vector<string> lines)
     instructions["ADD"] = type::INSTRUCTION;
     instructions["SUB"] = type::INSTRUCTION;
     instructions["MUL"] = type::INSTRUCTION;
+    instructions["MULA"] = type::INSTRUCTION;
+
     instructions["AND"] = type::INSTRUCTION;
     instructions["MOV"] = type::INSTRUCTION;
 
@@ -64,7 +66,7 @@ vector<Tokens> lex(vector<string> lines)
 
         regex numReg("[0-9]");         // num regex
         regex AlphaBetReg("[a-zA-Z]"); // num regex
-        regex regusterReg("R[0-9]"); // num regex
+        regex regusterReg("R[0-9]");   // num regex
 
         int comment = 0;
         std::smatch myMatch;
