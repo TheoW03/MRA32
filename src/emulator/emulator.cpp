@@ -120,7 +120,7 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
 }
 #pragma endregion
 
-#pragma region  DECODING_FUNCTIONS
+#pragma region DECODING_FUNCTIONS
 void emulate(vector<Instructions *> InstructionsList)
 {
     vector<EncodedInstructions *> encodedInstrtions = encode(InstructionsList);
@@ -155,6 +155,8 @@ void emulate(vector<Instructions *> InstructionsList)
 
             if (rd > 12)
             {
+                cout << "rd to big" << endl;
+                exit(EXIT_FAILURE);
                 return;
             }
             if (condition != 0xE)

@@ -25,7 +25,7 @@ Registers are
 
 ``R13`` frame pointer (when I impl. it)
 
-``R14`` stack pointer
+``R14`` stack pointer (when I impl. it)
 
 ``R15`` being the PC
 
