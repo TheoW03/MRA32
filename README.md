@@ -29,7 +29,7 @@ Registers are
 
 ``R15`` being the PC
 
-# Other Technical Info
+# Other Technical Details
 
 can only do Integers and positive numbers.
 
