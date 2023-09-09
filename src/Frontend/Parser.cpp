@@ -14,7 +14,9 @@ enum class InstructionType
 {
     CONDITIONAL,
     DATA_PROCESSING,
-    MULTIPLY
+    MULTIPLY,
+    BRANCH,
+    JMPBRANCH
 };
 
 struct Instructions
@@ -40,6 +42,17 @@ struct Multiply : public Instructions
     int Rd;
     int Rm;
 };
+struct Branch : public Instructions
+{
+    int PCLocation;
+    string branchName;
+};
+struct JMPBranch : public Instructions
+{
+    int condition;
+    int L;
+    string branchName;
+};
 // struct Instructions
 // {
 //     uint16_t opcode;
@@ -55,10 +68,13 @@ struct Multiply : public Instructions
 Tokens *current;
 Tokens *matchAndRemove(vector<Tokens> &tokens, type typeT)
 {
+
     if (tokens.empty())
     {
+
         return nullptr;
     }
+
     if (tokens[0].id == typeT)
     {
 
@@ -66,9 +82,10 @@ Tokens *matchAndRemove(vector<Tokens> &tokens, type typeT)
         current = new Tokens;
         current = t;
         tokens.erase(tokens.begin());
+
         return t;
     }
-    // cout << "unmatched \n";
+
     return nullptr;
 }
 int handleRegisters(Tokens *reg)
@@ -76,6 +93,23 @@ int handleRegisters(Tokens *reg)
 
     string substring = reg->buffer.substr(1, reg->buffer.length());
     return stoi(substring);
+}
+Instructions *handleBranch(vector<Tokens> &tokens)
+{
+    JMPBranch *a = new JMPBranch;
+    a->condition = 0xE;
+    a->L = 0;
+    if (matchAndRemove(tokens, type::WORD) != nullptr)
+    {
+
+        a->branchName = current->buffer;
+    }
+    else
+    {
+        cout << "branch name required" << endl;
+        exit(EXIT_FAILURE);
+    }
+    return a;
 }
 Instructions *handleMul(vector<Tokens> &tokens)
 {
@@ -133,11 +167,6 @@ Instructions *handle1Operand(vector<Tokens> &tokens, uint16_t opCode)
 {
 
     DataProcessing *a = new DataProcessing;
-
-    if (a == nullptr)
-    {
-        cout << " a== null ptr o.O " << endl;
-    }
     a->condition = 0xE;
 
     a->opcode = opCode;
@@ -161,18 +190,18 @@ Instructions *handle1Operand(vector<Tokens> &tokens, uint16_t opCode)
     }
     return a;
 }
-void RemoveEOLS(vector<Tokens> &list)
-{
-    while (true)
-    {
-        Tokens *e = matchAndRemove(list, type::END_OF_LINE);
+// void RemoveEOLS(vector<Tokens> &list)
+// {
+//     while (true)
+//     {
+//         Tokens *e = matchAndRemove(list, type::END_OF_LINE);
 
-        if (e == nullptr)
-        {
-            return;
-        }
-    }
-}
+//         if (e == nullptr)
+//         {
+//             return;
+//         }
+//     }
+// }
 vector<Instructions *> parse(vector<Tokens> tokens)
 {
     vector<Instructions *> a;
@@ -180,11 +209,7 @@ vector<Instructions *> parse(vector<Tokens> tokens)
     while (matchAndRemove(tokens, type::END_OF_PROGRAM) == nullptr)
     {
 
-        RemoveEOLS(tokens);
-
         Tokens *Instructiona = matchAndRemove(tokens, type::INSTRUCTION);
-
-        RemoveEOLS(tokens);
 
         if (Instructiona != nullptr)
         {
@@ -234,14 +259,25 @@ vector<Instructions *> parse(vector<Tokens> tokens)
             } //..so on for every possible instruction
             else if (Instructiona->buffer == "B")
             {
+
+                Instructions *in = handleBranch(tokens);
+
+                a.push_back(in);
             }
         }
         else
         {
-            cout << "null ptr" << endl;
-            cout << " " << endl;
+
+            if (matchAndRemove(tokens, type::WORD) != nullptr)
+            {
+                Branch *branch = new Branch;
+
+                branch->branchName = current->buffer;
+
+                a.push_back(branch);
+            }
         }
-        RemoveEOLS(tokens);
     }
+    cout << "parsing compete" << endl;
     return a;
 }

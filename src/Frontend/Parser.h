@@ -12,7 +12,9 @@ enum class InstructionType
 {
     CONDITIONAL,
     DATA_PROCESSING,
-    MULTIPLY
+    MULTIPLY,
+    BRANCH,
+    JMPBRANCH
 };
 #endif
 
@@ -41,6 +43,17 @@ struct Multiply : public Instructions
     int Rs;
     int Rd;
     int Rm;
+};
+struct Branch : public Instructions
+{
+    int PCLocation;
+    string branchName;
+};
+struct JMPBranch : public Instructions
+{
+    int condition;
+    int L;
+    string branchName;
 };
 
 #endif

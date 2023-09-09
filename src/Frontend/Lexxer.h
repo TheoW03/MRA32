@@ -15,8 +15,8 @@ enum class type
     REGISTER,
     NUMBER,
     COMMA,
-    END_OF_LINE,
-    END_OF_PROGRAM
+    END_OF_PROGRAM,
+    WORD
 
 };
 #endif

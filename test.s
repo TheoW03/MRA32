@@ -1,5 +1,7 @@
+main:
+B main2
 MOV R2, 10
-MOV R3, 2
-MOV R4, 10
 
-MULA R1, R2, R3, R4
+MOV R3, 2
+main2:
+MOV R4, 10

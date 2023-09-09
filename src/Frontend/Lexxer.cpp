@@ -14,7 +14,6 @@ enum class type
     REGISTER,
     NUMBER,
     COMMA,
-    END_OF_LINE,
     END_OF_PROGRAM,
     WORD
 
@@ -64,9 +63,9 @@ vector<Tokens> lex(vector<string> lines)
         int isComment = 0;
         string stringBuffer = "";
 
-        regex numReg("[0-9]");         // num regex
-        regex AlphaBetReg("[a-zA-Z]"); // num regex
-        regex regusterReg("R[0-9]");   // num regex
+        regex numReg("[0-9]");           // num regex
+        regex AlphaBetReg("[a-zA-Z]");   // num regex
+        regex registerReg("R[0|1[0-5]"); // num regex
 
         int comment = 0;
         std::smatch myMatch;
@@ -86,7 +85,8 @@ vector<Tokens> lex(vector<string> lines)
                     token.buffer = stringBuffer;
                     token.id = (instructions.find(stringBuffer) != instructions.end())                                              ? type::INSTRUCTION
                                : (regex_search(stringBuffer, myMatch, numReg) && !regex_search(stringBuffer, myMatch, AlphaBetReg)) ? type::NUMBER
-                                                                                                                                    : type::REGISTER;
+                               : (regex_search(stringBuffer, myMatch, registerReg))                                                 ? type::REGISTER
+                                                                                                                                    : type::WORD;
                     a.push_back(token);
                     stringBuffer = "";
                     state = 1;
@@ -126,6 +126,17 @@ vector<Tokens> lex(vector<string> lines)
                             state = 2;
                         }
                     }
+                    else if (str == ":")
+                    {
+                        if (stringBuffer != "")
+                        {
+                            Tokens token;
+                            token.buffer = stringBuffer;
+                            token.id = type::WORD;
+                            a.push_back(token);
+                            stringBuffer = "";
+                        }
+                    }
                     else
                     {
                         state = 2;
@@ -138,15 +149,30 @@ vector<Tokens> lex(vector<string> lines)
                     {
                         if (stringBuffer != "")
                         {
+                            cout << "register switches as word here  " << stringBuffer << endl;
                             Tokens token;
                             token.buffer = stringBuffer;
-                            token.id = (instructions.find(stringBuffer) != instructions.end()) ? type::INSTRUCTION : type::REGISTER;
+                            token.id = (instructions.find(stringBuffer) != instructions.end())                                              ? type::INSTRUCTION
+                                       : (regex_search(stringBuffer, myMatch, numReg) && !regex_search(stringBuffer, myMatch, AlphaBetReg)) ? type::NUMBER
+                                                                                                                                            : type::REGISTER;
                             a.push_back(token);
                             stringBuffer = "";
                             Tokens commaToken; // Create a separate token for the comma
                             commaToken.buffer = str;
                             commaToken.id = type::COMMA;
                             a.push_back(commaToken);
+                            state = 1;
+                        }
+                    }
+                    else if (str == ":")
+                    {
+                        if (stringBuffer != "")
+                        {
+                            Tokens token;
+                            token.buffer = stringBuffer;
+                            token.id = type::WORD;
+                            a.push_back(token);
+                            stringBuffer = "";
                             state = 1;
                         }
                     }
@@ -165,7 +191,8 @@ vector<Tokens> lex(vector<string> lines)
                     token.buffer = stringBuffer;
                     token.id = (instructions.find(stringBuffer) != instructions.end())                                              ? type::INSTRUCTION
                                : (regex_search(stringBuffer, myMatch, numReg) && !regex_search(stringBuffer, myMatch, AlphaBetReg)) ? type::NUMBER
-                                                                                                                                    : type::REGISTER;
+                               : (regex_search(stringBuffer, myMatch, registerReg))                                                 ? type::REGISTER
+                                                                                                                                    : type::WORD;
                     a.push_back(token);
                     stringBuffer = "";
 
@@ -181,16 +208,12 @@ vector<Tokens> lex(vector<string> lines)
             token.buffer = stringBuffer;
             token.id = (instructions.find(stringBuffer) != instructions.end())                                              ? type::INSTRUCTION
                        : (regex_search(stringBuffer, myMatch, numReg) && !regex_search(stringBuffer, myMatch, AlphaBetReg)) ? type::NUMBER
-                                                                                                                            : type::REGISTER;
+                       : (regex_search(stringBuffer, myMatch, registerReg))                                                 ? type::REGISTER
+                                                                                                                            : type::WORD;
             a.push_back(token);
             stringBuffer = "";
             state = 1;
         }
-
-        Tokens token;
-        token.buffer = ";";
-        token.id = type::END_OF_LINE;
-        a.push_back(token);
     }
     Tokens token;
     token.buffer = "";
@@ -206,8 +229,9 @@ void printList(vector<Tokens> a)
     out[type::NUMBER] = "NUMBER";
     out[type::REGISTER] = "REGISTER";
     out[type::COMMA] = "COMMA";
-    out[type::END_OF_LINE] = "END_OF_LINE";
     out[type::END_OF_PROGRAM] = "END_OF_PROGRAM";
+    out[type::WORD] = "WORD";
+
     for (int i = 0; i < a.size(); i++)
     {
         if (out.find(a[i].id) != out.end())

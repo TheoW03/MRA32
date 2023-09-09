@@ -11,7 +11,6 @@ enum class dataProcessingInstructions
 {
     ADD,
     SUB,
-    MUL,
     MOV
 };
 int PC = 0;
@@ -33,6 +32,10 @@ uint32_t handle_multiply(Multiply *instruction)
 {
     return (instruction->condition << 28) | (instruction->A << 21) | (instruction->Rd << 16) | (instruction->Rn << 12) | (instruction->Rs << 8) | instruction->Rm;
 }
+uint32_t encode_Branch(JMPBranch *instruction, int offset)
+{
+    return (instruction->condition << 28) | (instruction->L << 23) | offset;
+}
 uint32_t handle_data_processing(DataProcessing *instruction)
 {
 
@@ -40,6 +43,16 @@ uint32_t handle_data_processing(DataProcessing *instruction)
 }
 vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
 {
+    map<string, int> branchMap;
+    branchMap["."] = -1;
+    for (int i = 0; i < InstructionsList.size(); i++)
+    {
+        if (instanceof <Branch *>(InstructionsList[i]))
+        {
+            Branch *pd = dynamic_cast<Branch *>(InstructionsList[i]);
+            branchMap[pd->branchName] = i;
+        }
+    }
     vector<EncodedInstructions *> encoded_instructions;
 
     for (int i = 0; i < InstructionsList.size(); i++)
@@ -77,6 +90,23 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
             // encode multiply instructions
         }
 #pragma endregion
+        else if (instanceof <Branch *>(InstructionsList[i]))
+        {
+            EncodedInstructions *ei = new EncodedInstructions;
+
+            ei->encodedInstruction = 0;
+            ei->instructionType = InstructionType::BRANCH;
+            encoded_instructions.push_back(ei);
+        }
+        else if (instanceof <JMPBranch *>(InstructionsList[i]))
+        {
+            JMPBranch *pd = dynamic_cast<JMPBranch *>(InstructionsList[i]);
+
+            EncodedInstructions *ei = new EncodedInstructions;
+            ei->encodedInstruction = encode_Branch(pd, branchMap[pd->branchName]);
+            ei->instructionType = InstructionType::JMPBRANCH;
+            encoded_instructions.push_back(ei);
+        }
     }
     return encoded_instructions;
 }
@@ -90,9 +120,8 @@ void emulate(vector<Instructions *> InstructionsList)
     }
     for (int i = 0; i < encodedInstrtions.size(); i++)
     {
-
+        registersList[15] = i + 1;
 #pragma region DATA_PROCESSING decoding
-        registersList[15] += 4;
 
         if (encodedInstrtions[i]->instructionType == InstructionType::DATA_PROCESSING)
         {
@@ -112,10 +141,11 @@ void emulate(vector<Instructions *> InstructionsList)
             uint32_t immediate = instruction & 0xFFF;
 
             dataProcessingInstructions instructionTypes = instructionMap[opcode];
-            if (rd > 12)
-            {
-                return;
-            }
+
+            // if (rd > 12)
+            // {
+            //     return;
+            // }
             if (condition != 0xE)
             {
                 // execute condition
@@ -168,7 +198,10 @@ void emulate(vector<Instructions *> InstructionsList)
             uint32_t rn = (instruction >> 12) & 0x0F;
             uint32_t rs = (instruction >> 8) & 0x0F;
             uint32_t rm = instruction & 0xF;
-
+            // if (rd > 12)
+            // {
+            //     return;
+            // }
             if (condition != 0xE)
             {
                 // execute condition
@@ -185,7 +218,29 @@ void emulate(vector<Instructions *> InstructionsList)
             }
         }
 #pragma endregion
+#pragma region BRANCHING
+
+        else if (encodedInstrtions[i]->instructionType == InstructionType::JMPBRANCH)
+        {
+            uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
+
+            uint32_t condition = (instruction >> 28);
+            if (condition != 0xE)
+            {
+                // execute condition
+            }
+            uint32_t LBit = (instruction >> 23) & 1;
+            
+            uint32_t pcNewValue = instruction & 0xF;
+            i = pcNewValue - 1;
+        }
+        else if (encodedInstrtions[i]->instructionType == InstructionType::BRANCH)
+        {
+        }
+#pragma endregion
     }
+    cout << "a" << endl;
+
     for (int i = 0; i < 16; i++)
     {
         cout << "R" << i << " value: " << registersList[i] << endl;
