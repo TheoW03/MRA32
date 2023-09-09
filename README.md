@@ -19,8 +19,6 @@ also added comments with the "#"
 
 # Registers
 
-Registers are 
-
 ``R0-R12`` general purpose registers 
 
 ``R13`` frame pointer (when I impl. it)
