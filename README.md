@@ -1,6 +1,6 @@
 # QtMRA32
 
-ARM assmbler, written in C++
+WIP, ARM assembler, written in C++
 
 coded by TheoW03
 
@@ -21,13 +21,13 @@ also added comments with the "#"
 
 Registers are 
 
-R0-R12 general purpose registers 
+``R0-R12`` general purpose registers 
 
-R14 stack pointer
+``R13`` frame pointer (when I impl. it)
 
-R13 frame pointer (when I impl. it)
+``R14`` stack pointer
 
-R15 being the PC
+``R15`` being the PC
 
 
 can only do Integers and positive numbers.
@@ -35,3 +35,5 @@ can only do Integers and positive numbers.
 floating point numbers will be coming soon.
 
 (using my own floating point lib I used for MIPS)
+
+as of right now uses big endian. will implement little endian eventually
