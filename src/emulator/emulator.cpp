@@ -28,9 +28,12 @@ struct EncodedInstructions
     uint32_t encodedInstruction;
     InstructionType instructionType;
 };
+
+#pragma region ENCODING_FUNCTIONS
 uint32_t handle_multiply(Multiply *instruction)
 {
-    return (instruction->condition << 28) | (instruction->A << 21) | (instruction->Rd << 16) | (instruction->Rn << 12) | (instruction->Rs << 8) | instruction->Rm;
+
+    return (instruction->condition << 28) | (instruction->A << 24) | (instruction->Rd << 16) | (instruction->Rn << 12) | (instruction->Rs << 8) | instruction->Rm;
 }
 uint32_t encode_Branch(JMPBranch *instruction, int offset)
 {
@@ -76,7 +79,7 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
         }
 #pragma endregion
 
-#pragma region MULTIPLY
+#pragma region MULTIPLY encoding
         else if (instanceof <Multiply *>(InstructionsList[i]))
         {
             Multiply *pd = dynamic_cast<Multiply *>(InstructionsList[i]);
@@ -90,6 +93,8 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
             // encode multiply instructions
         }
 #pragma endregion
+
+#pragma region BRANCH encoding
         else if (instanceof <Branch *>(InstructionsList[i]))
         {
             EncodedInstructions *ei = new EncodedInstructions;
@@ -107,9 +112,15 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
             ei->instructionType = InstructionType::JMPBRANCH;
             encoded_instructions.push_back(ei);
         }
+#pragma endregion
     }
+
+    cout << "encoding instructions complete" << endl;
     return encoded_instructions;
 }
+#pragma endregion
+
+#pragma region  DECODING_FUNCTIONS
 void emulate(vector<Instructions *> InstructionsList)
 {
     vector<EncodedInstructions *> encodedInstrtions = encode(InstructionsList);
@@ -142,10 +153,10 @@ void emulate(vector<Instructions *> InstructionsList)
 
             dataProcessingInstructions instructionTypes = instructionMap[opcode];
 
-            // if (rd > 12)
-            // {
-            //     return;
-            // }
+            if (rd > 12)
+            {
+                return;
+            }
             if (condition != 0xE)
             {
                 // execute condition
@@ -193,15 +204,17 @@ void emulate(vector<Instructions *> InstructionsList)
         {
             uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
             uint32_t condition = (instruction >> 28);
-            uint32_t aBit = (instruction >> 21) & 1;
+            uint32_t aBit = (instruction >> 24) & 1;
             uint32_t rd = (instruction >> 16) & 0x0F;
             uint32_t rn = (instruction >> 12) & 0x0F;
             uint32_t rs = (instruction >> 8) & 0x0F;
-            uint32_t rm = instruction & 0xF;
-            // if (rd > 12)
-            // {
-            //     return;
-            // }
+            uint32_t rm = instruction & 0x0F;
+            if (rd > 12)
+            {
+                cout << "rd to big" << endl;
+                exit(EXIT_FAILURE);
+                return;
+            }
             if (condition != 0xE)
             {
                 // execute condition
@@ -218,7 +231,8 @@ void emulate(vector<Instructions *> InstructionsList)
             }
         }
 #pragma endregion
-#pragma region BRANCHING
+
+#pragma region BRANCHING decoding
 
         else if (encodedInstrtions[i]->instructionType == InstructionType::JMPBRANCH)
         {
@@ -230,19 +244,30 @@ void emulate(vector<Instructions *> InstructionsList)
                 // execute condition
             }
             uint32_t LBit = (instruction >> 23) & 1;
-            
+
             uint32_t pcNewValue = instruction & 0xF;
-            i = pcNewValue - 1;
+            i = (int)pcNewValue;
         }
         else if (encodedInstrtions[i]->instructionType == InstructionType::BRANCH)
         {
         }
 #pragma endregion
     }
-    cout << "a" << endl;
+#pragma region REGISTERS
+    cout << "" << endl;
+    cout << "REGISTERS" << endl;
+    cout << "===============" << endl;
+    cout << "" << endl;
 
     for (int i = 0; i < 16; i++)
     {
         cout << "R" << i << " value: " << registersList[i] << endl;
     }
+    cout << "" << endl;
+    cout << "===============" << endl;
+    cout << "" << endl;
+
+    cout << "code complete" << endl;
+#pragma endregion
 }
+#pragma endregion

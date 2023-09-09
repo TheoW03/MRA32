@@ -149,7 +149,6 @@ vector<Tokens> lex(vector<string> lines)
                     {
                         if (stringBuffer != "")
                         {
-                            cout << "register switches as word here  " << stringBuffer << endl;
                             Tokens token;
                             token.buffer = stringBuffer;
                             token.id = (instructions.find(stringBuffer) != instructions.end())                                              ? type::INSTRUCTION
@@ -219,6 +218,7 @@ vector<Tokens> lex(vector<string> lines)
     token.buffer = "";
     token.id = type::END_OF_PROGRAM;
     a.push_back(token);
+    cout << "lexxing complete" << endl;
     return a;
 }
 
