@@ -4,7 +4,7 @@ a ARM7TDMI-S 32-bit assembler, written in C++
 
 coded by TheoW03
 
-# instructions
+# Instructions
 
 ```
 MOV <Rd>, <const or Register>
@@ -29,6 +29,7 @@ Registers are
 
 ``R15`` being the PC
 
+# Other Technical Info
 
 can only do Integers and positive numbers.
 
