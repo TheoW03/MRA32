@@ -1,6 +1,6 @@
 # QtMRA32
 
-WIP, ARM assembler, written in C++
+a ARM7TDMI-S 32-bit assembler, written in C++
 
 coded by TheoW03
 
