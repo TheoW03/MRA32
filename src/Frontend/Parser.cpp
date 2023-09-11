@@ -88,16 +88,37 @@ Tokens *matchAndRemove(vector<Tokens> &tokens, type typeT)
 
     return nullptr;
 }
+int handle_condition(vector<Tokens> &tokens)
+{
+    map<string, int> conditions;
+    conditions["EQ"] = 0b0000;
+    conditions["NE"] = 0b0001;
+    if (matchAndRemove(tokens, type::CONDITION) == nullptr)
+    {
+        return 0xE;
+    }
+    else
+    {
+
+        return conditions[current->buffer]; // hashmap of condition codes here :3
+    }
+}
 int handleRegisters(Tokens *reg)
 {
 
     string substring = reg->buffer.substr(1, reg->buffer.length());
     return stoi(substring);
 }
+/**
+ * @brief B branch
+ * 
+ * @param tokens 
+ * @return Instructions* 
+ */
 Instructions *handleBranch(vector<Tokens> &tokens)
 {
     JMPBranch *a = new JMPBranch;
-    a->condition = 0xE;
+    a->condition = handle_condition(tokens);
     a->L = 0;
     if (matchAndRemove(tokens, type::WORD) != nullptr)
     {
@@ -111,6 +132,12 @@ Instructions *handleBranch(vector<Tokens> &tokens)
     }
     return a;
 }
+/**
+ * @brief MUL, Rd, Rn, Rm
+ * 
+ * @param tokens 
+ * @return Instructions* 
+ */
 Instructions *handleMul(vector<Tokens> &tokens)
 {
     Multiply *a = new Multiply;
@@ -124,6 +151,12 @@ Instructions *handleMul(vector<Tokens> &tokens)
     a->Rm = handleRegisters(matchAndRemove(tokens, type::REGISTER));
     return a;
 }
+/**
+ * @brief MULA rd, rn, rm, rs
+ * 
+ * @param tokens 
+ * @return Instructions* 
+ */
 Instructions *handleMulA(vector<Tokens> &tokens)
 {
     Multiply *a = new Multiply;
@@ -140,10 +173,19 @@ Instructions *handleMulA(vector<Tokens> &tokens)
 
     return a;
 }
+/**
+ * @brief designed for data processing
+ * 
+ * @param tokens 
+ * @param opCode 
+ * @return Instructions* 
+ */
 Instructions *handle2Operands(vector<Tokens> &tokens, uint16_t opCode)
 {
     DataProcessing *a = new DataProcessing;
+
     a->condition = 0xE;
+
     a->opcode = opCode;
     a->S = 0;
     a->Rd = handleRegisters(matchAndRemove(tokens, type::REGISTER));
@@ -163,6 +205,13 @@ Instructions *handle2Operands(vector<Tokens> &tokens, uint16_t opCode)
 
     return a;
 }
+/**
+ * @brief designed for mov
+ * 
+ * @param tokens 
+ * @param opCode 
+ * @return Instructions* 
+ */
 Instructions *handle1Operand(vector<Tokens> &tokens, uint16_t opCode)
 {
 
@@ -190,18 +239,12 @@ Instructions *handle1Operand(vector<Tokens> &tokens, uint16_t opCode)
     }
     return a;
 }
-// void RemoveEOLS(vector<Tokens> &list)
-// {
-//     while (true)
-//     {
-//         Tokens *e = matchAndRemove(list, type::END_OF_LINE);
-
-//         if (e == nullptr)
-//         {
-//             return;
-//         }
-//     }
-// }
+/**
+ * @brief parser :pet: :3
+ * 
+ * @param tokens 
+ * @return vector<Instructions *> 
+ */
 vector<Instructions *> parse(vector<Tokens> tokens)
 {
     vector<Instructions *> a;

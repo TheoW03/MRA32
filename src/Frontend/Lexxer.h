@@ -16,7 +16,8 @@ enum class type
     NUMBER,
     COMMA,
     END_OF_PROGRAM,
-    WORD
+    WORD,
+    CONDITION
 
 };
 #endif

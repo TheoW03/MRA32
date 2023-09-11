@@ -21,9 +21,9 @@ also added comments with the "#"
 
 ``R0-R12`` general purpose registers 
 
-``R13`` frame pointer (when I impl. it)
+``R13`` stack pointer (when i impl it)
 
-``R14`` stack pointer (when I impl. it)
+``R14`` Link  regiser (when I impl. it)
 
 ``R15`` being the PC
 

@@ -1,2 +1,2 @@
 BEQ R1, R3, L0
-ADDEQ R1, R2, 10
+ADD R1, R2, 10
