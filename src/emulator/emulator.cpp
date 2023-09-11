@@ -149,7 +149,7 @@ void emulate(vector<Instructions *> InstructionsList)
             uint32_t opcode = (instruction >> 21) & 0x0F;
             uint32_t rd = (instruction >> 12) & 0x0F;
             uint32_t rn = (instruction >> 16) & 0x0F;
-            uint32_t immediate = instruction & 0xFFF;
+            uint64_t immediate = instruction & 0xFFF ;
 
             dataProcessingInstructions instructionTypes = instructionMap[opcode];
 

@@ -15,7 +15,8 @@ enum class type
     NUMBER,
     COMMA,
     END_OF_PROGRAM,
-    WORD
+    WORD,
+    CONDITION
 
 };
 struct Tokens
@@ -24,6 +25,25 @@ struct Tokens
     type id;
     map<type, string> dictionary;
 };
+void printList(vector<Tokens> a)
+{
+    map<type, string> out;
+    out[type::INSTRUCTION] = "INSTRUCTION";
+    out[type::NUMBER] = "NUMBER";
+    out[type::REGISTER] = "REGISTER";
+    out[type::COMMA] = "COMMA";
+    out[type::END_OF_PROGRAM] = "END_OF_PROGRAM";
+    out[type::WORD] = "WORD";
+    out[type::CONDITION] = "CONDITION";
+
+    for (int i = 0; i < a.size(); i++)
+    {
+        if (out.find(a[i].id) != out.end())
+        {
+            cout << out[a[i].id] + " (" + a[i].buffer + ") " << endl;
+        }
+    }
+}
 vector<string> readFile(string file)
 {
     vector<string> vec;
@@ -56,6 +76,10 @@ vector<Tokens> lex(vector<string> lines)
 
     instructions["OR"] = type::INSTRUCTION;
     instructions["B"] = type::INSTRUCTION;
+
+    map<string, type> conditions;
+    conditions["EQ"] = type::CONDITION;
+    conditions["NE"] = type::CONDITION;
 
     for (int i = 0; i < lines.size(); i++)
     {
@@ -101,11 +125,23 @@ vector<Tokens> lex(vector<string> lines)
             }
             if (current != ' ' && current != '\t' && current != '\0')
             {
+                cout << "state: " << state << endl;
+                cout << "buffer: " << stringBuffer << endl;
+                // cout << "str: " << str << endl;
 
                 if (state == 1)
                 {
-
-                    if (regex_search(str, myMatch, numReg))
+                    if (instructions.find(stringBuffer) != instructions.end())
+                    {
+                        Tokens token;
+                        token.buffer = stringBuffer;
+                        token.id = type::INSTRUCTION;
+                        a.push_back(token);
+                        stringBuffer = "";
+                        stringBuffer += str;
+                        state = 3;
+                    }
+                    else if (regex_search(str, myMatch, numReg))
                     {
                         stringBuffer += str;
                     }
@@ -115,14 +151,17 @@ vector<Tokens> lex(vector<string> lines)
                         {
                             Tokens token;
                             token.buffer = stringBuffer;
-                            token.id = type::NUMBER;
+                            token.id = (regex_search(stringBuffer, myMatch, numReg) && !regex_search(stringBuffer, myMatch, AlphaBetReg)) ? type::NUMBER
+                                                                                                                                          : type::REGISTER;
+
                             a.push_back(token);
+
+                            cout << "" << endl;
                             stringBuffer = "";
                             Tokens commaToken; // Create a separate token for the comma
-
                             commaToken.buffer = str;
                             commaToken.id = type::COMMA;
-                            a.push_back(token);
+                            a.push_back(commaToken);
                             state = 2;
                         }
                     }
@@ -139,7 +178,6 @@ vector<Tokens> lex(vector<string> lines)
                     }
                     else
                     {
-                        state = 2;
                         stringBuffer += str;
                     }
                 }
@@ -155,6 +193,7 @@ vector<Tokens> lex(vector<string> lines)
                                        : (regex_search(stringBuffer, myMatch, numReg) && !regex_search(stringBuffer, myMatch, AlphaBetReg)) ? type::NUMBER
                                                                                                                                             : type::REGISTER;
                             a.push_back(token);
+                            cout << "where repetitive chars are" << endl;
                             stringBuffer = "";
                             Tokens commaToken; // Create a separate token for the comma
                             commaToken.buffer = str;
@@ -180,6 +219,24 @@ vector<Tokens> lex(vector<string> lines)
                         stringBuffer += str;
                     }
                 }
+                else if (state == 3)
+                {
+                    if (conditions.find(stringBuffer) != conditions.end())
+                    {
+                        Tokens token;
+                        token.buffer = stringBuffer;
+                        token.id = type::CONDITION;
+                        a.push_back(token);
+                        stringBuffer = "";
+                        state = 1;
+                    }
+                    else
+                    {
+                        cout << "condition " << endl;
+
+                        stringBuffer += str;
+                    }
+                }
             }
             else
             {
@@ -191,8 +248,11 @@ vector<Tokens> lex(vector<string> lines)
                     token.id = (instructions.find(stringBuffer) != instructions.end())                                              ? type::INSTRUCTION
                                : (regex_search(stringBuffer, myMatch, numReg) && !regex_search(stringBuffer, myMatch, AlphaBetReg)) ? type::NUMBER
                                : (regex_search(stringBuffer, myMatch, registerReg))                                                 ? type::REGISTER
+                               : (conditions.find(stringBuffer) != conditions.end())                                                ? type::CONDITION
                                                                                                                                     : type::WORD;
                     a.push_back(token);
+                    cout << "a: " << stringBuffer << endl;
+
                     stringBuffer = "";
 
                     state = 1;
@@ -202,13 +262,16 @@ vector<Tokens> lex(vector<string> lines)
 
         if (!stringBuffer.empty() && stringBuffer.size() != 0 && stringBuffer != "")
         {
+            cout << "end" << endl;
 
             Tokens token;
             token.buffer = stringBuffer;
             token.id = (instructions.find(stringBuffer) != instructions.end())                                              ? type::INSTRUCTION
                        : (regex_search(stringBuffer, myMatch, numReg) && !regex_search(stringBuffer, myMatch, AlphaBetReg)) ? type::NUMBER
                        : (regex_search(stringBuffer, myMatch, registerReg))                                                 ? type::REGISTER
-                                                                                                                            : type::WORD;
+                       : (conditions.find(stringBuffer) != conditions.end())                                                ? type::CONDITION
+
+                                                                             : type::WORD;
             a.push_back(token);
             stringBuffer = "";
             state = 1;
@@ -220,23 +283,4 @@ vector<Tokens> lex(vector<string> lines)
     a.push_back(token);
     cout << "lexxing complete" << endl;
     return a;
-}
-
-void printList(vector<Tokens> a)
-{
-    map<type, string> out;
-    out[type::INSTRUCTION] = "INSTRUCTION";
-    out[type::NUMBER] = "NUMBER";
-    out[type::REGISTER] = "REGISTER";
-    out[type::COMMA] = "COMMA";
-    out[type::END_OF_PROGRAM] = "END_OF_PROGRAM";
-    out[type::WORD] = "WORD";
-
-    for (int i = 0; i < a.size(); i++)
-    {
-        if (out.find(a[i].id) != out.end())
-        {
-            cout << out[a[i].id] + " (" + a[i].buffer + ") " << endl;
-        }
-    }
 }
