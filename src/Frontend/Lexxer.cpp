@@ -76,6 +76,7 @@ vector<Tokens> lex(vector<string> lines)
 
     instructions["OR"] = type::INSTRUCTION;
     instructions["B"] = type::INSTRUCTION;
+    instructions["CMP"] = type::INSTRUCTION;
 
     map<string, type> conditions;
     conditions["EQ"] = type::CONDITION;
@@ -125,9 +126,9 @@ vector<Tokens> lex(vector<string> lines)
             }
             if (current != ' ' && current != '\t' && current != '\0')
             {
-                cout << "state: " << state << endl;
-                cout << "buffer: " << stringBuffer << endl;
-                // cout << "str: " << str << endl;
+                // cout << "state: " << state << endl;
+                // cout << "buffer: " << stringBuffer << endl;
+                // // cout << "str: " << str << endl;
 
                 if (state == 1)
                 {
@@ -156,7 +157,7 @@ vector<Tokens> lex(vector<string> lines)
 
                             a.push_back(token);
 
-                            cout << "" << endl;
+                            // cout << "" << endl;
                             stringBuffer = "";
                             Tokens commaToken; // Create a separate token for the comma
                             commaToken.buffer = str;
@@ -193,7 +194,7 @@ vector<Tokens> lex(vector<string> lines)
                                        : (regex_search(stringBuffer, myMatch, numReg) && !regex_search(stringBuffer, myMatch, AlphaBetReg)) ? type::NUMBER
                                                                                                                                             : type::REGISTER;
                             a.push_back(token);
-                            cout << "where repetitive chars are" << endl;
+                            // cout << "where repetitive chars are" << endl;
                             stringBuffer = "";
                             Tokens commaToken; // Create a separate token for the comma
                             commaToken.buffer = str;
@@ -232,7 +233,7 @@ vector<Tokens> lex(vector<string> lines)
                     }
                     else
                     {
-                        cout << "condition " << endl;
+                        // cout << "condition " << endl;
 
                         stringBuffer += str;
                     }
@@ -251,7 +252,7 @@ vector<Tokens> lex(vector<string> lines)
                                : (conditions.find(stringBuffer) != conditions.end())                                                ? type::CONDITION
                                                                                                                                     : type::WORD;
                     a.push_back(token);
-                    cout << "a: " << stringBuffer << endl;
+                    // cout << "a: " << stringBuffer << endl;
 
                     stringBuffer = "";
 
@@ -262,7 +263,7 @@ vector<Tokens> lex(vector<string> lines)
 
         if (!stringBuffer.empty() && stringBuffer.size() != 0 && stringBuffer != "")
         {
-            cout << "end" << endl;
+            // cout << "end" << endl;
 
             Tokens token;
             token.buffer = stringBuffer;

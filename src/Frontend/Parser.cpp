@@ -51,6 +51,7 @@ struct JMPBranch : public Instructions
 {
     int condition;
     int L;
+
     string branchName;
 };
 // struct Instructions
@@ -111,9 +112,9 @@ int handleRegisters(Tokens *reg)
 }
 /**
  * @brief B branch
- * 
- * @param tokens 
- * @return Instructions* 
+ *
+ * @param tokens
+ * @return Instructions*
  */
 Instructions *handleBranch(vector<Tokens> &tokens)
 {
@@ -134,9 +135,9 @@ Instructions *handleBranch(vector<Tokens> &tokens)
 }
 /**
  * @brief MUL, Rd, Rn, Rm
- * 
- * @param tokens 
- * @return Instructions* 
+ *
+ * @param tokens
+ * @return Instructions*
  */
 Instructions *handleMul(vector<Tokens> &tokens)
 {
@@ -153,9 +154,9 @@ Instructions *handleMul(vector<Tokens> &tokens)
 }
 /**
  * @brief MULA rd, rn, rm, rs
- * 
- * @param tokens 
- * @return Instructions* 
+ *
+ * @param tokens
+ * @return Instructions*
  */
 Instructions *handleMulA(vector<Tokens> &tokens)
 {
@@ -175,10 +176,10 @@ Instructions *handleMulA(vector<Tokens> &tokens)
 }
 /**
  * @brief designed for data processing
- * 
- * @param tokens 
- * @param opCode 
- * @return Instructions* 
+ *
+ * @param tokens
+ * @param opCode
+ * @return Instructions*
  */
 Instructions *handle2Operands(vector<Tokens> &tokens, uint16_t opCode)
 {
@@ -207,10 +208,10 @@ Instructions *handle2Operands(vector<Tokens> &tokens, uint16_t opCode)
 }
 /**
  * @brief designed for mov
- * 
- * @param tokens 
- * @param opCode 
- * @return Instructions* 
+ *
+ * @param tokens
+ * @param opCode
+ * @return Instructions*
  */
 Instructions *handle1Operand(vector<Tokens> &tokens, uint16_t opCode)
 {
@@ -241,9 +242,9 @@ Instructions *handle1Operand(vector<Tokens> &tokens, uint16_t opCode)
 }
 /**
  * @brief parser :pet: :3
- * 
- * @param tokens 
- * @return vector<Instructions *> 
+ *
+ * @param tokens
+ * @return vector<Instructions *>
  */
 vector<Instructions *> parse(vector<Tokens> tokens)
 {
@@ -305,6 +306,12 @@ vector<Instructions *> parse(vector<Tokens> tokens)
 
                 Instructions *in = handleBranch(tokens);
 
+                a.push_back(in);
+            }
+            else if (Instructiona->buffer == "CMP")
+            {
+                Instructions *in = handle1Operand(tokens, 0xA);
+                // in->instructionType = InstructionType::DATA_PROCESSING;
                 a.push_back(in);
             }
         }

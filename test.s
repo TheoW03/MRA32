@@ -1,2 +1,9 @@
-BEQ R1, R3, L0
-ADD R1, R2, 10
+MOV R1, 1
+MOV R2, 1
+CMP R1, R2
+BEQ main
+BNE L2
+main:
+ ADD R3, R1, R2
+L2:
+

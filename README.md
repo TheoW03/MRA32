@@ -1,21 +1,39 @@
 # QtMRA32
 
-a ARM7TDMI-S 32-bit assembler, written in C++
+a ARM7TDMI-S 32-bit assembler, written in C++ and inspired by QTSPIM
 
 coded by TheoW03
 
 # Instructions
 
 ```
+CMP <RN>, <const or register>
 MOV <Rd>, <const or Register>
 ADD <Rd>, <Rn>, <Rm or const>
 SUB <Rd>, <Rn>, <Rm or const>
 MUL <Rd>, <Rn>, <Rm>
 MLA <Rd>, <Rn>, <Rm>, <Rs>
-B <BRANCH_NAME>
+B <BRANCH_NAME> # this is a comment
 branch: 
 ```
-also added comments with the "#" 
+
+also added comments with the "#" they follow the MIPS and numbers are like this
+
+
+# Conditinally executed instructions
+
+
+will follow the nearest CMP in your code. aslong as you have a condition prefix in the
+
+so ADD becomes ADDEQ 
+
+the conditions I added so far
+
+```
+EQ <Rn>, <Rm or const>
+NE <Rn>, <Rm or const>
+```
+
 
 # Registers
 
@@ -29,7 +47,7 @@ also added comments with the "#"
 
 # Other Technical Details
 
-can only do Integers and positive numbers.
+can only do Integers and positive numbers. and numbers up to 2^12 or 4096
 
 floating point numbers will be coming soon.
 

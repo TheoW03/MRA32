@@ -11,7 +11,8 @@ enum class dataProcessingInstructions
 {
     ADD,
     SUB,
-    MOV
+    MOV,
+    CMP
 };
 int PC = 0;
 template <typename Base, typename T>
@@ -120,6 +121,10 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
 }
 #pragma endregion
 
+uint16_t Z_FLAG = 0;
+uint16_t C_FLAG = 0;
+uint16_t N_FLAG = 0;
+uint16_t V_FLAG = 0;
 #pragma region DECODING_FUNCTIONS
 void emulate(vector<Instructions *> InstructionsList)
 {
@@ -133,23 +138,41 @@ void emulate(vector<Instructions *> InstructionsList)
     {
         registersList[15] = i + 1;
 #pragma region DATA_PROCESSING decoding
+        uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
 
+//condition code 
+        uint32_t condition = (instruction >> 28);
+        if (condition != 0xE)
+        {
+            if (condition == 0x0)
+            {
+                if (Z_FLAG == 0)
+                {
+                    continue;
+                }
+            }
+            else if (condition == 0x1)
+            {
+                if (Z_FLAG == 1)
+                {
+                    continue;
+                }
+            }
+        }
         if (encodedInstrtions[i]->instructionType == InstructionType::DATA_PROCESSING)
         {
 
             map<int, dataProcessingInstructions> instructionMap;
             instructionMap[0x4] = dataProcessingInstructions::ADD;
             instructionMap[0x2] = dataProcessingInstructions::SUB;
-            // instructionMap[0x9] = dataProcessingInstructions::MUL;
+            instructionMap[0xA] = dataProcessingInstructions::CMP;
             instructionMap[0xD] = dataProcessingInstructions::MOV;
 
-            uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
-            uint32_t condition = (instruction >> 28);
             uint32_t iBit = (instruction >> 25) & 1;
             uint32_t opcode = (instruction >> 21) & 0x0F;
             uint32_t rd = (instruction >> 12) & 0x0F;
             uint32_t rn = (instruction >> 16) & 0x0F;
-            uint64_t immediate = instruction & 0xFFF ;
+            uint64_t immediate = instruction & 0xFFF;
 
             dataProcessingInstructions instructionTypes = instructionMap[opcode];
 
@@ -158,10 +181,6 @@ void emulate(vector<Instructions *> InstructionsList)
                 cout << "rd to big" << endl;
                 exit(EXIT_FAILURE);
                 return;
-            }
-            if (condition != 0xE)
-            {
-                // execute condition
             }
             if (instructionTypes == dataProcessingInstructions::ADD) // ADD
             {
@@ -198,14 +217,39 @@ void emulate(vector<Instructions *> InstructionsList)
                     registersList[rd] = registersList[immediate];
                 }
             }
+            else if (instructionTypes == dataProcessingInstructions::CMP)
+            {
+                if (iBit == 1)
+                {
+                    if (registersList[rd] == immediate)
+                    {
+                        Z_FLAG = 1;
+                    }
+                    else
+                    {
+                        Z_FLAG = 0;
+                    }
+                }
+                else
+                {
+                    if (registersList[rd] == registersList[immediate])
+                    {
+                        Z_FLAG = 1;
+                    }
+                    else
+                    {
+                        Z_FLAG = 0;
+                    }
+                }
+            }
         }
 #pragma endregion
 
 #pragma region MULTIPLY decoding
         else if (encodedInstrtions[i]->instructionType == InstructionType::MULTIPLY)
         {
-            uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
-            uint32_t condition = (instruction >> 28);
+            // uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
+            // uint32_t condition = (instruction >> 28);
             uint32_t aBit = (instruction >> 21) & 1;
             uint32_t rd = (instruction >> 16) & 0x0F;
             uint32_t rn = (instruction >> 12) & 0x0F;
@@ -217,10 +261,10 @@ void emulate(vector<Instructions *> InstructionsList)
                 exit(EXIT_FAILURE);
                 return;
             }
-            if (condition != 0xE)
-            {
-                // execute condition
-            }
+            // if (condition != 0xE)
+            // {
+            //     // execute condition
+            // }
             if (aBit == 1)
             {
                 int c = (registersList[rm] * registersList[rn]) + registersList[rs];
@@ -238,16 +282,29 @@ void emulate(vector<Instructions *> InstructionsList)
 
         else if (encodedInstrtions[i]->instructionType == InstructionType::JMPBRANCH)
         {
-            uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
+            // uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
 
-            uint32_t condition = (instruction >> 28);
-            if (condition != 0xE)
-            {
-                // execute condition
-            }
+            // uint32_t condition = (instruction >> 28);
+            // if (condition != 0xE)
+            // {
+            //     if (condition == 0x0)
+            //     {
+            //         if (Z_FLAG == 0)
+            //         {
+            //             continue;
+            //         }
+            //     }
+            //     else if (condition == 0x1)
+            //     {
+            //         if (Z_FLAG == 1)
+            //         {
+            //             continue;
+            //         }
+            //     }
+            // }
             uint32_t LBit = (instruction >> 23) & 1;
 
-            uint32_t pcNewValue = instruction & 0xF;
+            uint32_t pcNewValue = instruction & 0x7FFFFF;
             i = (int)pcNewValue;
         }
         else if (encodedInstrtions[i]->instructionType == InstructionType::BRANCH)
