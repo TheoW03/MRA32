@@ -54,3 +54,5 @@ floating point numbers will be coming soon.
 (using my own floating point lib I used for MIPS)
 
 as of right now uses big endian. will implement little endian eventually
+
+(not a full 1:1 emulation of an ARM CPU)
