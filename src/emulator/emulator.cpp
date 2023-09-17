@@ -125,6 +125,8 @@ uint16_t Z_FLAG = 0;
 uint16_t C_FLAG = 0;
 uint16_t N_FLAG = 0;
 uint16_t V_FLAG = 0;
+int cycles = 0;
+int total_cycles = 0;
 #pragma region DECODING_FUNCTIONS
 void emulate(vector<Instructions *> InstructionsList)
 {
@@ -137,30 +139,77 @@ void emulate(vector<Instructions *> InstructionsList)
     for (int i = 0; i < encodedInstrtions.size(); i++)
     {
         registersList[15] = i + 1;
-#pragma region DATA_PROCESSING decoding
         uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
+        cycles = 1;
 
-//condition code 
+#pragma region CONDITIONS
+        // condition code
         uint32_t condition = (instruction >> 28);
         if (condition != 0xE)
         {
-            if (condition == 0x0)
+            if (condition == 0x0) // EQ
             {
                 if (Z_FLAG == 0)
                 {
                     continue;
                 }
             }
-            else if (condition == 0x1)
+            else if (condition == 0x1) // NE
             {
                 if (Z_FLAG == 1)
                 {
                     continue;
                 }
             }
+            else if (condition == 0xc) // GT
+            {
+                if (N_FLAG != V_FLAG)
+                {
+                    continue;
+                }
+            }
+            else if (condition == 0xb) // LT
+            {
+                if (N_FLAG == V_FLAG)
+                {
+                    continue;
+                }
+            }
+            //the recomended way was N == V and Z == 0 || N != V. but this way i feel is more efficent
+
+            else if (condition == 0xa)
+            {
+                if (N_FLAG != V_FLAG) // LE
+                {
+                    if (Z_FLAG == 1)
+                    {
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+            else if (condition == 0xc)
+            {
+                if (N_FLAG == V_FLAG) // GE
+                {
+                    if (Z_FLAG == 1)
+                    {
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
         }
+#pragma endregion
+#pragma region DATA_PROCESSING decoding
+
         if (encodedInstrtions[i]->instructionType == InstructionType::DATA_PROCESSING)
         {
+            cycles = 0;
 
             map<int, dataProcessingInstructions> instructionMap;
             instructionMap[0x4] = dataProcessingInstructions::ADD;
@@ -229,6 +278,15 @@ void emulate(vector<Instructions *> InstructionsList)
                     {
                         Z_FLAG = 0;
                     }
+                    if (registersList[rd] < immediate)
+                    {
+                        N_FLAG = 1;
+                    }
+                    else
+                    {
+                        V_FLAG = 1;
+                        N_FLAG = 1;
+                    }
                 }
                 else
                 {
@@ -240,31 +298,37 @@ void emulate(vector<Instructions *> InstructionsList)
                     {
                         Z_FLAG = 0;
                     }
+                    if (registersList[rd] < registersList[immediate])
+                    {
+                        N_FLAG = 1;
+                    }
+                    else
+                    {
+                        V_FLAG = 1;
+                        N_FLAG = 1;
+                    }
                 }
             }
+            cycles += 3;
         }
 #pragma endregion
 
 #pragma region MULTIPLY decoding
         else if (encodedInstrtions[i]->instructionType == InstructionType::MULTIPLY)
         {
-            // uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
-            // uint32_t condition = (instruction >> 28);
             uint32_t aBit = (instruction >> 21) & 1;
             uint32_t rd = (instruction >> 16) & 0x0F;
             uint32_t rn = (instruction >> 12) & 0x0F;
             uint32_t rs = (instruction >> 8) & 0x0F;
             uint32_t rm = instruction & 0x0F;
+            cycles = 0;
+
             if (rd > 12)
             {
                 cout << "rd to big" << endl;
                 exit(EXIT_FAILURE);
                 return;
             }
-            // if (condition != 0xE)
-            // {
-            //     // execute condition
-            // }
             if (aBit == 1)
             {
                 int c = (registersList[rm] * registersList[rn]) + registersList[rs];
@@ -275,6 +339,7 @@ void emulate(vector<Instructions *> InstructionsList)
 
                 registersList[rd] = registersList[rn] * registersList[rm];
             }
+            cycles += 2;
         }
 #pragma endregion
 
@@ -282,34 +347,19 @@ void emulate(vector<Instructions *> InstructionsList)
 
         else if (encodedInstrtions[i]->instructionType == InstructionType::JMPBRANCH)
         {
-            // uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
 
-            // uint32_t condition = (instruction >> 28);
-            // if (condition != 0xE)
-            // {
-            //     if (condition == 0x0)
-            //     {
-            //         if (Z_FLAG == 0)
-            //         {
-            //             continue;
-            //         }
-            //     }
-            //     else if (condition == 0x1)
-            //     {
-            //         if (Z_FLAG == 1)
-            //         {
-            //             continue;
-            //         }
-            //     }
-            // }
             uint32_t LBit = (instruction >> 23) & 1;
 
             uint32_t pcNewValue = instruction & 0x7FFFFF;
+            cycles = 0;
+
             i = (int)pcNewValue;
+            cycles += 3;
         }
         else if (encodedInstrtions[i]->instructionType == InstructionType::BRANCH)
         {
         }
+        total_cycles += cycles;
 #pragma endregion
     }
 #pragma region REGISTERS
@@ -325,7 +375,8 @@ void emulate(vector<Instructions *> InstructionsList)
     cout << "" << endl;
     cout << "===============" << endl;
     cout << "" << endl;
-
+    cout << "number of cycles took: " << total_cycles << endl;
+    cout << "" << endl;
     cout << "code complete" << endl;
 #pragma endregion
 }

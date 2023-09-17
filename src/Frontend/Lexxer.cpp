@@ -81,6 +81,10 @@ vector<Tokens> lex(vector<string> lines)
     map<string, type> conditions;
     conditions["EQ"] = type::CONDITION;
     conditions["NE"] = type::CONDITION;
+    conditions["GT"] = type::CONDITION;
+    conditions["LT"] = type::CONDITION;
+    conditions["GE"] = type::CONDITION;
+    conditions["LE"] = type::CONDITION;
 
     for (int i = 0; i < lines.size(); i++)
     {

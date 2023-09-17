@@ -94,6 +94,11 @@ int handle_condition(vector<Tokens> &tokens)
     map<string, int> conditions;
     conditions["EQ"] = 0b0000;
     conditions["NE"] = 0b0001;
+    conditions["GT"] = 0b1100;
+    conditions["LT"] = 0b1011;
+    conditions["GE"] = 0b1010;
+    conditions["LE"] = 0b1101;
+
     if (matchAndRemove(tokens, type::CONDITION) == nullptr)
     {
         return 0xE;
