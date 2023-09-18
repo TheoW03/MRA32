@@ -12,7 +12,8 @@ enum class dataProcessingInstructions
     ADD,
     SUB,
     MOV,
-    CMP
+    CMP,
+    ORR
 };
 int PC = 0;
 template <typename Base, typename T>
@@ -24,13 +25,50 @@ Instructions::~Instructions()
 {
     // implementation of the destructor goes here
 }
+
 struct EncodedInstructions
 {
     uint32_t encodedInstruction;
     InstructionType instructionType;
 };
+struct Memory
+{
+    vector<EncodedInstructions *> instructions;
+    vector<uint16_t> memory_allocate;
+};
 
 #pragma region ENCODING_FUNCTIONS
+
+uint32_t leftRotate(int n, unsigned int d)
+{
+
+    return (n << d) | (n >> (32 - d));
+}
+
+uint32_t rightRotate(int n, unsigned int d)
+{
+    return (n >> d) | (n << (32 - d));
+}
+uint32_t encode_immediate(uint32_t n)
+{
+    int i = -1;
+    uint32_t a = 258;
+    do
+    {
+        i++;
+        a = leftRotate(n, i);
+
+    } while (i < 32 && a > 256);
+    cout << "number: " << n << endl;
+
+    cout << "rotated bits: " << a << endl;
+    cout << "i: " << i << endl;
+    if (i >= 32 && a > 256)
+    {
+        return 0;
+    }
+    return ((i / 2) << 8) | a;
+}
 uint32_t handle_multiply(Multiply *instruction)
 {
 
@@ -40,10 +78,25 @@ uint32_t encode_Branch(JMPBranch *instruction, int offset)
 {
     return (instruction->condition << 28) | (instruction->L << 23) | offset;
 }
+
 uint32_t handle_data_processing(DataProcessing *instruction)
 {
+    int b = 0;
+    if (instruction->I == 1)
+    {
+        if (encode_immediate(instruction->OP2) == 0)
+        {
+            // instruction->I = 0;
+            cout << "0" << endl;
+        }
+        else
+        {
+            b = 1;
+            return (instruction->condition << 28) | (b << 27) | (instruction->I << 25) | (instruction->opcode << 21) | (instruction->Rn << 16) | (instruction->Rd << 12) | encode_immediate(instruction->OP2);
+        }
+    }
 
-    return (instruction->condition << 28) | (instruction->I << 25) | (instruction->opcode << 21) | (instruction->Rn << 16) | (instruction->Rd << 12) | instruction->OP2;
+    return (instruction->condition << 28) | (b << 27) | (instruction->I << 25) | (instruction->opcode << 21) | (instruction->Rn << 16) | (instruction->Rd << 12) | instruction->OP2;
 }
 vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
 {
@@ -175,7 +228,7 @@ void emulate(vector<Instructions *> InstructionsList)
                     continue;
                 }
             }
-            //the recomended way was N == V and Z == 0 || N != V. but this way i feel is more efficent
+            // the recomended way was N == V and Z == 0 || N != V. but this way i feel is more efficent
 
             else if (condition == 0xa)
             {
@@ -216,12 +269,24 @@ void emulate(vector<Instructions *> InstructionsList)
             instructionMap[0x2] = dataProcessingInstructions::SUB;
             instructionMap[0xA] = dataProcessingInstructions::CMP;
             instructionMap[0xD] = dataProcessingInstructions::MOV;
+            instructionMap[0xC] = dataProcessingInstructions::ORR;
 
             uint32_t iBit = (instruction >> 25) & 1;
             uint32_t opcode = (instruction >> 21) & 0x0F;
             uint32_t rd = (instruction >> 12) & 0x0F;
             uint32_t rn = (instruction >> 16) & 0x0F;
             uint64_t immediate = instruction & 0xFFF;
+            uint64_t canror = (instruction >> 27) & 1;
+            cout << canror << endl;
+
+            if (iBit == 1 && canror == 1)
+            {
+                uint64_t rotationamt = (instruction >> 8) & 0xF;
+                uint64_t value = (instruction)&0xFF;
+                immediate = rightRotate((value), (rotationamt * 2));
+                cout << "ibit == 1" << endl;
+                cout << immediate << endl;
+            }
 
             dataProcessingInstructions instructionTypes = instructionMap[opcode];
 
@@ -307,6 +372,18 @@ void emulate(vector<Instructions *> InstructionsList)
                         V_FLAG = 1;
                         N_FLAG = 1;
                     }
+                }
+            }
+            else if (instructionTypes == dataProcessingInstructions::ORR)
+            {
+                cout << (uint32_t)(904 | immediate) << endl;
+                if (iBit == 1)
+                {
+                    registersList[rd] = (int)registersList[rn] | immediate;
+                }
+                else
+                {
+                    registersList[rd] = (int)registersList[rn] | registersList[immediate];
                 }
             }
             cycles += 3;

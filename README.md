@@ -1,6 +1,6 @@
 # QtMRA32
 
-a ARM7TDMI-S 32-bit instruction, 12 bit integer assembler, written in C++ and inspired by QTSPIM
+a ARM v7 32-bit instruction, 12 bit integer assembler, written in C++ and inspired by QTSPIM
 
 coded by TheoW03
 

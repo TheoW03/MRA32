@@ -1,9 +1,2 @@
-MOV R1, 2
-MOV R2, 1
-CMP R1, R2
-BGE main
-BLT L2
-main:
- ADD R3, R1, R2
-L2:
-
+MOV R1, 5001
+ORR R1, R1, 4096

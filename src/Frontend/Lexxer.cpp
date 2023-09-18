@@ -74,7 +74,7 @@ vector<Tokens> lex(vector<string> lines)
     instructions["AND"] = type::INSTRUCTION;
     instructions["MOV"] = type::INSTRUCTION;
 
-    instructions["OR"] = type::INSTRUCTION;
+    instructions["ORR"] = type::INSTRUCTION;
     instructions["B"] = type::INSTRUCTION;
     instructions["CMP"] = type::INSTRUCTION;
 

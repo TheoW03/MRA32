@@ -319,6 +319,11 @@ vector<Instructions *> parse(vector<Tokens> tokens)
                 // in->instructionType = InstructionType::DATA_PROCESSING;
                 a.push_back(in);
             }
+            else if (Instructiona->buffer == "ORR")
+            {
+                Instructions *in = handle2Operands(tokens, 0xC);
+                a.push_back(in);
+            }
         }
         else
         {

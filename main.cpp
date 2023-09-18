@@ -32,9 +32,41 @@ using namespace std;
  * LE: 1101
  * Registers are R
  */
+// uint32_t leftRotate(int n, unsigned int d)
+// {
+//     /* In n<<d, last d bits are 0. To put first 3 bits of n
+//        at last, do bitwise or of n<<d with n >>(INT_BITS -
+//        d) */
+//     return (n << d) | (n >> (32 - d));
+// }
+
+// /*Function to right rotate n by d bits*/
+// uint32_t rightRotate(int n, unsigned int d)
+// {
+//     /* In n>>d, first d bits are 0. To put last 3 bits of at
+//             first, do bitwise or of n>>d with n <<(INT_BITS
+//        - d) */
+//     return (n >> d) | (n << (32 - d));
+// }
 int main(int argc, char const *argv[])
 {
+    // int n = 261120;
+    // int d = 22;
+    // cout << n << endl;
     emulate(parse(lex(readFile("test.s"))));
+    // cout << leftRotate(n, d) << endl;
+    // int i = 0;
+    // uint32_t a = 258;
+    // do
+    // {
+    //     i += 2;
+    //     a = leftRotate(n, i);
+    //     cout << a << endl;
+    //     cout << i << endl;
+    //     cout << (i < 32 || a > 256) << endl;
+    // } while (i < 32 && a > 256);
+
+    // cout << rightRotate(a, i) << endl;
     // printList(lex(readFile("test.s")));
     // lex(readFile("test.s"));
     // parse(lex(readFile("test.s")));
