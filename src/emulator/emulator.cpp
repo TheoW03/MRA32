@@ -59,10 +59,6 @@ uint32_t encode_immediate(uint32_t n)
         a = leftRotate(n, i);
 
     } while (i < 32 && a > 256);
-    cout << "number: " << n << endl;
-
-    cout << "rotated bits: " << a << endl;
-    cout << "i: " << i << endl;
     if (i >= 32 && a > 256)
     {
         return 0;
@@ -84,12 +80,7 @@ uint32_t handle_data_processing(DataProcessing *instruction)
     int b = 0;
     if (instruction->I == 1)
     {
-        if (encode_immediate(instruction->OP2) == 0)
-        {
-            // instruction->I = 0;
-            cout << "0" << endl;
-        }
-        else
+        if (encode_immediate(instruction->OP2) != 0)
         {
             b = 1;
             return (instruction->condition << 28) | (b << 27) | (instruction->I << 25) | (instruction->opcode << 21) | (instruction->Rn << 16) | (instruction->Rd << 12) | encode_immediate(instruction->OP2);
@@ -121,7 +112,7 @@ vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
             DataProcessing *pd = dynamic_cast<DataProcessing *>(InstructionsList[i]);
             if (pd == nullptr)
             {
-                cout << "null" << to_string(i) << endl;
+                cout << "null " << to_string(i) << endl;
                 exit(0);
             }
             EncodedInstructions *ei = new EncodedInstructions;
@@ -277,15 +268,12 @@ void emulate(vector<Instructions *> InstructionsList)
             uint32_t rn = (instruction >> 16) & 0x0F;
             uint64_t immediate = instruction & 0xFFF;
             uint64_t canror = (instruction >> 27) & 1;
-            cout << canror << endl;
 
             if (iBit == 1 && canror == 1)
             {
                 uint64_t rotationamt = (instruction >> 8) & 0xF;
                 uint64_t value = (instruction)&0xFF;
                 immediate = rightRotate((value), (rotationamt * 2));
-                cout << "ibit == 1" << endl;
-                cout << immediate << endl;
             }
 
             dataProcessingInstructions instructionTypes = instructionMap[opcode];
@@ -376,7 +364,7 @@ void emulate(vector<Instructions *> InstructionsList)
             }
             else if (instructionTypes == dataProcessingInstructions::ORR)
             {
-                cout << (uint32_t)(904 | immediate) << endl;
+                // cout << (uint32_t)(904 | immediate) << endl;
                 if (iBit == 1)
                 {
                     registersList[rd] = (int)registersList[rn] | immediate;
