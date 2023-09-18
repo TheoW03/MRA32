@@ -54,6 +54,12 @@ GT <Rn>, <Rm or const>
 
 can only do Integers and positive numbers. and numbers up to 2^12 or 4096
 
+if a number is not a power of 2, and is greater than 4096. then do "ORR" to the nearest power of 2
+
+example: 5000, will be 4096
+
+if the result happens of ORR to the nearest power of 2, happens to be "1" or something, then it means ROR worked, so leave it alone.
+
 floating point numbers will be coming soon.
 
 (using my own floating point lib I used for MIPS)

@@ -59,6 +59,10 @@ uint32_t encode_immediate(uint32_t n)
         a = leftRotate(n, i);
 
     } while (i < 32 && a > 256);
+    if (n < 4096)
+    {
+        return 0;
+    }
     if (i >= 32 && a > 256)
     {
         return 0;
