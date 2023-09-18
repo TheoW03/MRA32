@@ -15,6 +15,7 @@ MUL <Rd>, <Rn>, <Rm>
 MLA <Rd>, <Rn>, <Rm>, <Rs>
 B <BRANCH_NAME> # this is a comment
 branch: 
+ORR <Rd>, <Rn>, <Rm or const>
 ```
 
 also added comments with the "#" they follow the MIPS and numbers are like this
