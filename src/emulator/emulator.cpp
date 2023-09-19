@@ -281,7 +281,6 @@ void emulate(vector<Instructions *> InstructionsList)
                 uint64_t rotationamt = (instruction >> 8) & 0xF;
                 uint64_t value = (instruction)&0xFF;
                 immediate = rightRotate((value), (rotationamt * 2));
-                cout << "rd to big " << rotationamt << endl;
             }
 
             dataProcessingInstructions instructionTypes = instructionMap[opcode];
