@@ -1,8 +1,7 @@
 # QtMRA32
 
-a ARM v7 32-bit instruction, 12 bit integer assembler, written in C++ and inspired by QTSPIM
+an ARMv7 32 bit assembler
 
-coded by TheoW03
 
 # Instructions
 
@@ -24,7 +23,7 @@ AND <Rd>, <Rn>, <Rm or const> # bitwise AND not logical AND
 also added comments with the "#" they follow the MIPS and numbers are like this
 
 
-# Conditinally executed instructions
+# Conditinally Executed Instructions
 
 
 will follow the nearest CMP in your code. aslong as you have a condition prefix in the
@@ -63,8 +62,8 @@ if a number is not a power of 2, and is greater than 4096. then do "ORR" to the 
 example: 
 
 ```
-MOV R0, 576
-ORR R0, R0, 4096999424
+MOV R0, 5000
+ORR R0, R0, 4096
 ```
 
 
