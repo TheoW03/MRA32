@@ -56,16 +56,17 @@ GT <Rn>, <Rm or const>
 
 # Other Technical Details
 
-can only do Integers and positive numbers. and numbers up to 2^12 or 4096
+can only do Integers and positive numbers. and numbers up to 2^12 or 4096 
 
 if a number is not a power of 2, and is greater than 4096. then do "ORR" to the nearest power of 2
 
 example: 
 
 ```
-MOV R0, 5000
-ORR R0, R0, 4096
+MOV R0, 576
+ORR R0, R0, 4096999424
 ```
+
 
 if this results in a "wierd" number, its one of the few numbers the ROR works with, if it does. you dont need the
 ORR

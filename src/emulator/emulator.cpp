@@ -52,11 +52,11 @@ uint32_t rightRotate(int n, unsigned int d)
 }
 uint32_t encode_immediate(uint32_t n)
 {
-    int i = -1;
+    int i = 0;
     uint32_t a = 258;
     do
     {
-        i++;
+        i+=2;
         a = leftRotate(n, i);
 
     } while (i < 32 && a > 256);
@@ -276,19 +276,19 @@ void emulate(vector<Instructions *> InstructionsList)
             uint32_t rn = (instruction >> 16) & 0x0F;
             uint64_t immediate = instruction & 0xFFF;
             uint64_t canror = (instruction >> 27) & 1;
-
             if (iBit == 1 && canror == 1)
             {
                 uint64_t rotationamt = (instruction >> 8) & 0xF;
                 uint64_t value = (instruction)&0xFF;
                 immediate = rightRotate((value), (rotationamt * 2));
+                cout << "rd to big " << rotationamt << endl;
             }
 
             dataProcessingInstructions instructionTypes = instructionMap[opcode];
 
             if (rd > 12)
             {
-                cout << "rd to big" << endl;
+                cout << "rd to big " << rd << endl;
                 exit(EXIT_FAILURE);
                 return;
             }
