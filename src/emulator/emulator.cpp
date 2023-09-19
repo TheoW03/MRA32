@@ -13,7 +13,8 @@ enum class dataProcessingInstructions
     SUB,
     MOV,
     CMP,
-    ORR
+    ORR,
+    AND
 };
 int PC = 0;
 template <typename Base, typename T>
@@ -87,11 +88,11 @@ uint32_t handle_data_processing(DataProcessing *instruction)
         if (encode_immediate(instruction->OP2) != 0)
         {
             b = 1;
-            return (instruction->condition << 28) | (b << 27) | (instruction->I << 25) | (instruction->opcode << 21) | (instruction->Rn << 16) | (instruction->Rd << 12) | encode_immediate(instruction->OP2);
+            return (instruction->condition << 28) | (b << 27) | (instruction->I << 25) | (instruction->opcode << 21) | (instruction->S << 20) | (instruction->Rn << 16) | (instruction->Rd << 12) | encode_immediate(instruction->OP2);
         }
     }
 
-    return (instruction->condition << 28) | (b << 27) | (instruction->I << 25) | (instruction->opcode << 21) | (instruction->Rn << 16) | (instruction->Rd << 12) | instruction->OP2;
+    return (instruction->condition << 28) | (b << 27) | (instruction->I << 25) | (instruction->opcode << 21) | (instruction->S << 20) | (instruction->Rn << 16) | (instruction->Rd << 12) | instruction->OP2;
 }
 vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
 {
@@ -260,6 +261,8 @@ void emulate(vector<Instructions *> InstructionsList)
             cycles = 0;
 
             map<int, dataProcessingInstructions> instructionMap;
+            instructionMap[0x0] = dataProcessingInstructions::AND;
+
             instructionMap[0x4] = dataProcessingInstructions::ADD;
             instructionMap[0x2] = dataProcessingInstructions::SUB;
             instructionMap[0xA] = dataProcessingInstructions::CMP;
@@ -268,6 +271,7 @@ void emulate(vector<Instructions *> InstructionsList)
 
             uint32_t iBit = (instruction >> 25) & 1;
             uint32_t opcode = (instruction >> 21) & 0x0F;
+            uint32_t SBit = (instruction >> 20) & 1;
             uint32_t rd = (instruction >> 12) & 0x0F;
             uint32_t rn = (instruction >> 16) & 0x0F;
             uint64_t immediate = instruction & 0xFFF;
@@ -376,6 +380,17 @@ void emulate(vector<Instructions *> InstructionsList)
                 else
                 {
                     registersList[rd] = (int)registersList[rn] | registersList[immediate];
+                }
+            }
+            else if (instructionTypes == dataProcessingInstructions::AND)
+            {
+                if (iBit == 1)
+                {
+                    registersList[rd] = (int)registersList[rn] & immediate;
+                }
+                else
+                {
+                    registersList[rd] = (int)registersList[rn] & registersList[immediate];
                 }
             }
             cycles += 3;

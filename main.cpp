@@ -53,7 +53,6 @@ int main(int argc, char const *argv[])
     // int n = 261120;
     // int d = 22;
     // cout << n << endl;
-    emulate(parse(lex(readFile("test.s"))));
     // cout << leftRotate(n, d) << endl;
     // int i = 0;
     // uint32_t a = 258;
@@ -67,6 +66,8 @@ int main(int argc, char const *argv[])
     // } while (i < 32 && a > 256);
 
     // cout << rightRotate(a, i) << endl;
+    emulate(parse(lex(readFile("test.s"))));
+
     // printList(lex(readFile("test.s")));
     // lex(readFile("test.s"));
     // parse(lex(readFile("test.s")));

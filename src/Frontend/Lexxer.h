@@ -17,7 +17,8 @@ enum class type
     COMMA,
     END_OF_PROGRAM,
     WORD,
-    CONDITION
+    CONDITION,
+    S_BIT
 
 };
 #endif

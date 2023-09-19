@@ -16,7 +16,8 @@ enum class type
     COMMA,
     END_OF_PROGRAM,
     WORD,
-    CONDITION
+    CONDITION,
+    S_BIT
 
 };
 struct Tokens
@@ -35,6 +36,8 @@ void printList(vector<Tokens> a)
     out[type::END_OF_PROGRAM] = "END_OF_PROGRAM";
     out[type::WORD] = "WORD";
     out[type::CONDITION] = "CONDITION";
+
+    out[type::S_BIT] = "S_BIT";
 
     for (int i = 0; i < a.size(); i++)
     {
@@ -85,6 +88,7 @@ vector<Tokens> lex(vector<string> lines)
     conditions["LT"] = type::CONDITION;
     conditions["GE"] = type::CONDITION;
     conditions["LE"] = type::CONDITION;
+    conditions["S"] = type::S_BIT;
 
     for (int i = 0; i < lines.size(); i++)
     {
@@ -253,7 +257,7 @@ vector<Tokens> lex(vector<string> lines)
                     token.id = (instructions.find(stringBuffer) != instructions.end())                                              ? type::INSTRUCTION
                                : (regex_search(stringBuffer, myMatch, numReg) && !regex_search(stringBuffer, myMatch, AlphaBetReg)) ? type::NUMBER
                                : (regex_search(stringBuffer, myMatch, registerReg))                                                 ? type::REGISTER
-                               : (conditions.find(stringBuffer) != conditions.end())                                                ? type::CONDITION
+                               : (conditions.find(stringBuffer) != conditions.end())                                                ? conditions[stringBuffer]
                                                                                                                                     : type::WORD;
                     a.push_back(token);
                     // cout << "a: " << stringBuffer << endl;
@@ -274,9 +278,8 @@ vector<Tokens> lex(vector<string> lines)
             token.id = (instructions.find(stringBuffer) != instructions.end())                                              ? type::INSTRUCTION
                        : (regex_search(stringBuffer, myMatch, numReg) && !regex_search(stringBuffer, myMatch, AlphaBetReg)) ? type::NUMBER
                        : (regex_search(stringBuffer, myMatch, registerReg))                                                 ? type::REGISTER
-                       : (conditions.find(stringBuffer) != conditions.end())                                                ? type::CONDITION
-
-                                                                             : type::WORD;
+                       : (conditions.find(stringBuffer) != conditions.end())                                                ? conditions[stringBuffer]
+                                                                                                                            : type::WORD;
             a.push_back(token);
             stringBuffer = "";
             state = 1;

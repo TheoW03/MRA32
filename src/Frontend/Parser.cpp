@@ -147,8 +147,7 @@ Instructions *handleBranch(vector<Tokens> &tokens)
 Instructions *handleMul(vector<Tokens> &tokens)
 {
     Multiply *a = new Multiply;
-    a->condition = 0xE;
-
+    a->condition = handle_condition(tokens);
     a->A = 0;
     a->Rd = handleRegisters(matchAndRemove(tokens, type::REGISTER));
     matchAndRemove(tokens, type::COMMA);
@@ -166,9 +165,10 @@ Instructions *handleMul(vector<Tokens> &tokens)
 Instructions *handleMulA(vector<Tokens> &tokens)
 {
     Multiply *a = new Multiply;
-    a->condition = 0xE;
+    a->condition = handle_condition(tokens);
 
     a->A = 1;
+
     a->Rd = handleRegisters(matchAndRemove(tokens, type::REGISTER));
     matchAndRemove(tokens, type::COMMA);
     a->Rn = handleRegisters(matchAndRemove(tokens, type::REGISTER));
@@ -190,10 +190,17 @@ Instructions *handle2Operands(vector<Tokens> &tokens, uint16_t opCode)
 {
     DataProcessing *a = new DataProcessing;
 
-    a->condition = 0xE;
+    a->condition = handle_condition(tokens);
 
     a->opcode = opCode;
-    a->S = 0;
+    if (matchAndRemove(tokens, type::S_BIT))
+    {
+        a->S = 1;
+    }
+    else
+    {
+        a->S = 0;
+    }
     a->Rd = handleRegisters(matchAndRemove(tokens, type::REGISTER));
     matchAndRemove(tokens, type::COMMA);
     a->Rn = handleRegisters(matchAndRemove(tokens, type::REGISTER));
@@ -222,10 +229,17 @@ Instructions *handle1Operand(vector<Tokens> &tokens, uint16_t opCode)
 {
 
     DataProcessing *a = new DataProcessing;
-    a->condition = 0xE;
+    a->condition = handle_condition(tokens);
 
     a->opcode = opCode;
-    a->S = 1;
+    if (matchAndRemove(tokens, type::S_BIT))
+    {
+        a->S = 1;
+    }
+    else
+    {
+        a->S = 0;
+    }
 
     a->Rd = handleRegisters(matchAndRemove(tokens, type::REGISTER));
 
@@ -324,6 +338,7 @@ vector<Instructions *> parse(vector<Tokens> tokens)
                 Instructions *in = handle2Operands(tokens, 0xC);
                 a.push_back(in);
             }
+            
         }
         else
         {
