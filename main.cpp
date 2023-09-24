@@ -3,7 +3,7 @@
 #include "src/Frontend/Lexxer.h"
 #include "src/Frontend/Parser.h"
 #include "src/emulator/emulator.h"
-
+#include <bitset>
 using namespace std;
 
 /**
@@ -32,6 +32,7 @@ using namespace std;
  * LE: 1101
  * Registers are R
  */
+
 int main(int argc, char const *argv[])
 {
     // int n = 261120;
@@ -49,7 +50,10 @@ int main(int argc, char const *argv[])
     //     cout << (i < 32 || a > 256) << endl;
     // } while (i < 32 && a > 256);
 
-    // cout << rightRotate(a, i) << endl;
+    // // cout << rightRotate(a, i) << endl;
+    // cout << subc(0b10010, 0b110) << endl;
+    // cout << sub(0b10010, 0b110) << endl;
+
     emulate(parse(lex(readFile("test.s"))));
 
     // printList(lex(readFile("test.s")));

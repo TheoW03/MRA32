@@ -338,7 +338,16 @@ vector<Instructions *> parse(vector<Tokens> tokens)
                 Instructions *in = handle2Operands(tokens, 0xC);
                 a.push_back(in);
             }
-            
+            else if (Instructiona->buffer == "ADC")
+            {
+                Instructions *in = handle2Operands(tokens, 0x5);
+                a.push_back(in);
+            }
+            else if (Instructiona->buffer == "SBC")
+            {
+                Instructions *in = handle2Operands(tokens, 0x6);
+                a.push_back(in);
+            }
         }
         else
         {

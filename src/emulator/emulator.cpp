@@ -5,7 +5,7 @@
 #include <string>
 #include "../../src/Frontend/Lexxer.h"
 #include "../../src/Frontend/Parser.h"
-
+#include "../../src/emulator/bitwiseop.h"
 using namespace std;
 enum class dataProcessingInstructions
 {
@@ -14,7 +14,9 @@ enum class dataProcessingInstructions
     MOV,
     CMP,
     ORR,
-    AND
+    AND,
+    ADC,
+    SBC
 };
 int PC = 0;
 template <typename Base, typename T>
@@ -40,23 +42,13 @@ struct Memory
 
 #pragma region ENCODING_FUNCTIONS
 
-uint32_t leftRotate(int n, unsigned int d)
-{
-
-    return (n << d) | (n >> (32 - d));
-}
-
-uint32_t rightRotate(int n, unsigned int d)
-{
-    return (n >> d) | (n << (32 - d));
-}
 uint32_t encode_immediate(uint32_t n)
 {
     int i = 0;
     uint32_t a = 258;
     do
     {
-        i+=2;
+        i += 2;
         a = leftRotate(n, i);
 
     } while (i < 32 && a > 256);
@@ -268,6 +260,8 @@ void emulate(vector<Instructions *> InstructionsList)
             instructionMap[0xA] = dataProcessingInstructions::CMP;
             instructionMap[0xD] = dataProcessingInstructions::MOV;
             instructionMap[0xC] = dataProcessingInstructions::ORR;
+            instructionMap[0x5] = dataProcessingInstructions::ADC;
+            instructionMap[0x6] = dataProcessingInstructions::SBC;
 
             uint32_t iBit = (instruction >> 25) & 1;
             uint32_t opcode = (instruction >> 21) & 0x0F;
@@ -295,22 +289,22 @@ void emulate(vector<Instructions *> InstructionsList)
             {
                 if (iBit == 1)
                 {
-                    registersList[rd] = registersList[rn] + immediate;
+                    registersList[rd] = (int)add(registersList[rn], immediate);
                 }
                 else
                 {
-                    registersList[rd] = registersList[rn] + registersList[immediate];
+                    registersList[rd] = (int)add(registersList[rn], registersList[immediate]);
                 }
             }
             else if (instructionTypes == dataProcessingInstructions::SUB) // SUB
             {
                 if (iBit == 1)
                 {
-                    registersList[rd] = registersList[rn] - immediate;
+                    registersList[rd] = (int)sub(registersList[rn], immediate);
                 }
                 else
                 {
-                    registersList[rd] = registersList[rn] - registersList[immediate];
+                    registersList[rd] = (int)sub(registersList[rn], registersList[immediate]);
                 }
             }
 
@@ -390,6 +384,28 @@ void emulate(vector<Instructions *> InstructionsList)
                 else
                 {
                     registersList[rd] = (int)registersList[rn] & registersList[immediate];
+                }
+            }
+            else if (instructionTypes == dataProcessingInstructions::ADC)
+            {
+                if (iBit == 1)
+                {
+                    registersList[rd] = (int)add(registersList[rn], immediate);
+                }
+                else
+                {
+                    registersList[rd] = (int)add(registersList[rn], registersList[immediate]);
+                }
+            }
+            else if (instructionTypes == dataProcessingInstructions::SBC)
+            {
+                if (iBit == 1)
+                {
+                    registersList[rd] = (int)sub(registersList[rn], immediate);
+                }
+                else
+                {
+                    registersList[rd] = (int)sub(registersList[rn], registersList[immediate]);
                 }
             }
             cycles += 3;

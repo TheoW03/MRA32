@@ -80,6 +80,8 @@ vector<Tokens> lex(vector<string> lines)
     instructions["ORR"] = type::INSTRUCTION;
     instructions["B"] = type::INSTRUCTION;
     instructions["CMP"] = type::INSTRUCTION;
+    instructions["ADC"] = type::INSTRUCTION;
+    instructions["SBC"] = type::INSTRUCTION;
 
     map<string, type> conditions;
     conditions["EQ"] = type::CONDITION;
