@@ -33,23 +33,26 @@ so ADD becomes ADDEQ
 the conditions I added so far
 
 ```
-EQ <Rn>, <Rm or const>
-NE <Rn>, <Rm or const>
-LE <Rn>, <Rm or const>
-GE <Rn>, <Rm or const>
-LT <Rn>, <Rm or const>
-GT <Rn>, <Rm or const>
+EQ <Rn>, <Rm or const> (Z_FLAG = 1)
+NE <Rn>, <Rm or const> (Z_FLAG = 0)
+LE <Rn>, <Rm or const> (N_FLAG =  1 OR Z_FLAG = 1)
+GE <Rn>, <Rm or const> (N_FLAG = 0 OR Z_FLAG = 1)
+LT <Rn>, <Rm or const> (N_FLAG = 1)
+GT <Rn>, <Rm or const> (N_FLAG = 0)
 
 ```
 
+you can edit the flags
 
 # Registers
 
 ``R0-R12`` general purpose registers 
 
+``R7`` sys call register
+
 ``R13`` stack pointer (when i impl it)
 
-``R14`` Link  regiser (when I impl. it)
+``R14`` Link  register (when I impl. it)
 
 ``R15`` being the PC
 
