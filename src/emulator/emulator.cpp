@@ -204,14 +204,14 @@ void emulate(vector<Instructions *> InstructionsList)
             }
             else if (condition == 0xc) // GT
             {
-                if (N_FLAG != V_FLAG)
+                if (N_FLAG == 0)
                 {
                     continue;
                 }
             }
             else if (condition == 0xb) // LT
             {
-                if (N_FLAG == V_FLAG)
+                if (N_FLAG == 1)
                 {
                     continue;
                 }
