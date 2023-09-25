@@ -2,7 +2,7 @@ MOV R0, 255
 MOV R1, 254
 
 CMP R1, R0
-BLE L1
+BGT L1
 main:
     MOV R4, 1
 L1:
