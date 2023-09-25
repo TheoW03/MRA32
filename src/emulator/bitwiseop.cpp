@@ -42,3 +42,17 @@ uint32_t sub(uint32_t a, uint32_t b, int &carryCond)
     }
     return a;
 }
+uint32_t mul(uint32_t a, uint32_t b)
+{
+    uint32_t result = 0;
+    while (a > 0 && b > 0)
+    {
+        if (a & 1)
+        {                // if Least significant bit exists
+            result += b; // add by shifted left
+        }
+        a >>= 1;
+        b <<= 1; // next bit
+    }
+    return result;
+}

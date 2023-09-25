@@ -65,7 +65,7 @@ uint32_t encode_immediate(uint32_t n)
 uint32_t handle_multiply(Multiply *instruction)
 {
 
-    return (instruction->condition << 28) | (instruction->A << 21) | (instruction->Rd << 16) | (instruction->Rn << 12) | (instruction->Rs << 8) | instruction->Rm;
+    return (instruction->condition << 28) | (instruction->A << 21) | (instruction->S << 20) | (instruction->Rd << 16) | (instruction->Rn << 12) | (instruction->Rs << 8) | instruction->Rm;
 }
 uint32_t encode_Branch(JMPBranch *instruction, int offset)
 {
@@ -418,6 +418,7 @@ void emulate(vector<Instructions *> InstructionsList)
         else if (encodedInstrtions[i]->instructionType == InstructionType::MULTIPLY)
         {
             uint32_t aBit = (instruction >> 21) & 1;
+            uint32_t sBit = (instruction >> 20) & 1;
             uint32_t rd = (instruction >> 16) & 0x0F;
             uint32_t rn = (instruction >> 12) & 0x0F;
             uint32_t rs = (instruction >> 8) & 0x0F;
@@ -437,8 +438,11 @@ void emulate(vector<Instructions *> InstructionsList)
             }
             else
             {
-
-                registersList[rd] = registersList[rn] * registersList[rm];
+                registersList[rd] = mul(registersList[rn], registersList[rm]);
+            }
+            if (sBit == 1)
+            {
+                editCPSRFlags(registersList[rd]);
             }
             cycles += 2;
         }

@@ -3,6 +3,7 @@
 #include "src/Frontend/Lexxer.h"
 #include "src/Frontend/Parser.h"
 #include "src/emulator/emulator.h"
+#include "src/emulator/bitwiseop.h"
 #include <bitset>
 using namespace std;
 
@@ -55,6 +56,7 @@ int main(int argc, char const *argv[])
     // cout << sub(0b10010, 0b110) << endl;
 
     emulate(parse(lex(readFile("test.s"))));
+    // cout << mul(2, 1) << endl;
 
     // printList(lex(readFile("test.s")));
     // lex(readFile("test.s"));

@@ -39,6 +39,7 @@ struct Multiply : public Instructions
 {
     int condition;
     int A;
+    int S;
     int Rn;
     int Rs;
     int Rd;

@@ -37,6 +37,7 @@ struct Multiply : public Instructions
 {
     int condition;
     int A;
+    int S;
     int Rn;
     int Rs;
     int Rd;
@@ -166,7 +167,14 @@ Instructions *handleMulA(vector<Tokens> &tokens)
 {
     Multiply *a = new Multiply;
     a->condition = handle_condition(tokens);
-
+    if (matchAndRemove(tokens, type::S_BIT) != nullptr)
+    {
+        a->S = 1;
+    }
+    else
+    {
+        a->S = 0;
+    }
     a->A = 1;
 
     a->Rd = handleRegisters(matchAndRemove(tokens, type::REGISTER));
@@ -193,7 +201,7 @@ Instructions *handle2Operands(vector<Tokens> &tokens, uint16_t opCode)
     a->condition = handle_condition(tokens);
 
     a->opcode = opCode;
-    if (matchAndRemove(tokens, type::S_BIT))
+    if (matchAndRemove(tokens, type::S_BIT) != nullptr)
     {
         a->S = 1;
     }
@@ -232,7 +240,7 @@ Instructions *handle1Operand(vector<Tokens> &tokens, uint16_t opCode)
     a->condition = handle_condition(tokens);
 
     a->opcode = opCode;
-    if (matchAndRemove(tokens, type::S_BIT))
+    if (matchAndRemove(tokens, type::S_BIT) != nullptr)
     {
         a->S = 1;
     }
