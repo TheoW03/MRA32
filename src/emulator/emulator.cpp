@@ -86,6 +86,7 @@ uint32_t handle_data_processing(DataProcessing *instruction)
 
     return (instruction->condition << 28) | (b << 27) | (instruction->I << 25) | (instruction->opcode << 21) | (instruction->S << 20) | (instruction->Rn << 16) | (instruction->Rd << 12) | instruction->OP2;
 }
+
 vector<EncodedInstructions *> encode(vector<Instructions *> InstructionsList)
 {
     map<string, int> branchMap;
@@ -168,6 +169,19 @@ uint16_t N_FLAG = 0;
 uint16_t V_FLAG = 0;
 int cycles = 0;
 int total_cycles = 0;
+void editCPSRFlags(uint32_t calculation)
+{
+    N_FLAG = ((calculation >> 31) & 1);
+    Z_FLAG = (bool)!calculation;
+    if (calculation > 2147483648)
+    {
+        V_FLAG = 1;
+    }
+    else
+    {
+        V_FLAG = 0;
+    }
+}
 #pragma region DECODING_FUNCTIONS
 void emulate(vector<Instructions *> InstructionsList)
 {
@@ -240,6 +254,7 @@ void emulate(vector<Instructions *> InstructionsList)
             }
         }
 #pragma endregion
+
 #pragma region DATA_PROCESSING decoding
 
         if (encodedInstrtions[i]->instructionType == InstructionType::DATA_PROCESSING)
@@ -264,6 +279,7 @@ void emulate(vector<Instructions *> InstructionsList)
             uint32_t rn = (instruction >> 16) & 0x0F;
             uint64_t immediate = instruction & 0xFFF;
             uint64_t canror = (instruction >> 27) & 1;
+            int carry = 0;
             if (iBit == 1 && canror == 1)
             {
                 uint64_t rotationamt = (instruction >> 8) & 0xF;
@@ -283,22 +299,32 @@ void emulate(vector<Instructions *> InstructionsList)
             {
                 if (iBit == 1)
                 {
-                    registersList[rd] = (int)add(registersList[rn], immediate);
+                    registersList[rd] = (int)add(registersList[rn], immediate, carry);
                 }
                 else
                 {
-                    registersList[rd] = (int)add(registersList[rn], registersList[immediate]);
+                    registersList[rd] = (int)add(registersList[rn], registersList[immediate], carry);
+                }
+                if (SBit == 1)
+                {
+                    editCPSRFlags(registersList[rd]);
+                    C_FLAG = carry;
                 }
             }
             else if (instructionTypes == dataProcessingInstructions::SUB) // SUB
             {
                 if (iBit == 1)
                 {
-                    registersList[rd] = (int)sub(registersList[rn], immediate);
+                    registersList[rd] = (int)sub(registersList[rn], immediate, carry);
                 }
                 else
                 {
-                    registersList[rd] = (int)sub(registersList[rn], registersList[immediate]);
+                    registersList[rd] = (int)sub(registersList[rn], registersList[immediate], carry);
+                }
+                if (SBit == 1)
+                {
+                    editCPSRFlags(registersList[rd]);
+                    C_FLAG = carry;
                 }
             }
 
@@ -319,22 +345,14 @@ void emulate(vector<Instructions *> InstructionsList)
                 uint32_t a;
                 if (iBit == 1)
                 {
-                    a = (int)sub(registersList[rd], immediate);
+                    a = (int)sub(registersList[rd], immediate, carry);
                 }
                 else
                 {
-                    a = sub(registersList[rd], registersList[immediate]);
+                    a = sub(registersList[rd], registersList[immediate], carry);
                 }
-                N_FLAG = ((a >> 31) & 1);
-                Z_FLAG = (bool)!a;
-                if (a > 2147483648)
-                {
-                    V_FLAG = 1;
-                }
-                else
-                {
-                    V_FLAG = 0;
-                }
+                editCPSRFlags(a);
+                C_FLAG = carry;
             }
             else if (instructionTypes == dataProcessingInstructions::ORR)
             {
@@ -361,24 +379,35 @@ void emulate(vector<Instructions *> InstructionsList)
             }
             else if (instructionTypes == dataProcessingInstructions::ADC)
             {
+
                 if (iBit == 1)
                 {
-                    registersList[rd] = (int)add(registersList[rn], immediate) + C_FLAG;
+                    registersList[rd] = (int)add(registersList[rn], immediate, carry) + C_FLAG;
                 }
                 else
                 {
-                    registersList[rd] = (int)add(registersList[rn], registersList[immediate]) + C_FLAG;
+                    registersList[rd] = (int)add(registersList[rn], registersList[immediate], carry) + C_FLAG;
+                }
+                if (SBit == 1)
+                {
+                    editCPSRFlags(registersList[rd]);
+                    C_FLAG = carry;
                 }
             }
             else if (instructionTypes == dataProcessingInstructions::SBC)
             {
                 if (iBit == 1)
                 {
-                    registersList[rd] = (int)sub(registersList[rn], immediate) - C_FLAG;
+                    registersList[rd] = (int)sub(registersList[rn], immediate, carry) - C_FLAG;
                 }
                 else
                 {
-                    registersList[rd] = (int)sub(registersList[rn], registersList[immediate]) - C_FLAG;
+                    registersList[rd] = (int)sub(registersList[rn], registersList[immediate], carry) - C_FLAG;
+                }
+                if (SBit == 1)
+                {
+                    editCPSRFlags(registersList[rd]);
+                    C_FLAG = carry;
                 }
             }
             cycles += 3;
@@ -448,8 +477,16 @@ void emulate(vector<Instructions *> InstructionsList)
     cout << "===============" << endl;
     cout << "" << endl;
     cout << "number of cycles took: " << total_cycles << endl;
+    cout << "===============" << endl;
+    cout << "CPSR conditions" << endl;
+    cout << "N: " << N_FLAG << endl;
+    cout << "V: " << V_FLAG << endl;
+    cout << "C: " << C_FLAG << endl;
+    cout << "Z: " << Z_FLAG << endl;
+    cout << "===============" << endl;
     cout << "" << endl;
     cout << "code complete" << endl;
 #pragma endregion
 }
+
 #pragma endregion
