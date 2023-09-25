@@ -1,4 +1,9 @@
-MOV R0, 10
-MOV R1, 6
+MOV R0, 255
+MOV R1, 254
 
-ADD R2, R0, R1
+CMP R1, R0
+BLE L1
+main:
+    MOV R4, 1
+L1:
+    MOV R3, 2

@@ -20,8 +20,10 @@ uint32_t add(uint32_t a, uint32_t b)
         a = a ^ b;
         b = carry << 1;
     }
+
     return a;
 }
+
 uint32_t sub(uint32_t a, uint32_t b)
 {
     while (b != 0)

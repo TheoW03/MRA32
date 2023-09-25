@@ -185,7 +185,7 @@ void emulate(vector<Instructions *> InstructionsList)
 
 #pragma region CONDITIONS
         // condition code
-        uint32_t condition = (instruction >> 28);
+        uint32_t condition = (instruction >> 28) & 0x0F;
         if (condition != 0xE)
         {
             if (condition == 0x0) // EQ
@@ -220,28 +220,22 @@ void emulate(vector<Instructions *> InstructionsList)
 
             else if (condition == 0xa)
             {
-                if (N_FLAG != V_FLAG) // LE
+                if (N_FLAG == 1 && Z_FLAG != 1) // LE
                 {
-                    if (Z_FLAG == 1)
-                    {
-                    }
-                    else
-                    {
-                        continue;
-                    }
+                    continue;
+                }
+                else
+                {
                 }
             }
-            else if (condition == 0xc)
+            else if (condition == 0xd)
             {
-                if (N_FLAG == V_FLAG) // GE
+                if (N_FLAG == 0 && Z_FLAG != 1) // GE
                 {
-                    if (Z_FLAG == 1)
-                    {
-                    }
-                    else
-                    {
-                        continue;
-                    }
+                    continue;
+                }
+                else
+                {
                 }
             }
         }
@@ -322,45 +316,24 @@ void emulate(vector<Instructions *> InstructionsList)
             }
             else if (instructionTypes == dataProcessingInstructions::CMP)
             {
+                uint32_t a;
                 if (iBit == 1)
                 {
-                    if (registersList[rd] == immediate)
-                    {
-                        Z_FLAG = 1;
-                    }
-                    else
-                    {
-                        Z_FLAG = 0;
-                    }
-                    if (registersList[rd] < immediate)
-                    {
-                        N_FLAG = 1;
-                    }
-                    else
-                    {
-                        V_FLAG = 1;
-                        N_FLAG = 1;
-                    }
+                    a = (int)sub(registersList[rd], immediate);
                 }
                 else
                 {
-                    if (registersList[rd] == registersList[immediate])
-                    {
-                        Z_FLAG = 1;
-                    }
-                    else
-                    {
-                        Z_FLAG = 0;
-                    }
-                    if (registersList[rd] < registersList[immediate])
-                    {
-                        N_FLAG = 1;
-                    }
-                    else
-                    {
-                        V_FLAG = 1;
-                        N_FLAG = 1;
-                    }
+                    a = sub(registersList[rd], registersList[immediate]);
+                }
+                N_FLAG = ((a >> 31) & 1);
+                Z_FLAG = (bool)!a;
+                if (a > 2147483648)
+                {
+                    V_FLAG = 1;
+                }
+                else
+                {
+                    V_FLAG = 0;
                 }
             }
             else if (instructionTypes == dataProcessingInstructions::ORR)
@@ -390,22 +363,22 @@ void emulate(vector<Instructions *> InstructionsList)
             {
                 if (iBit == 1)
                 {
-                    registersList[rd] = (int)add(registersList[rn], immediate);
+                    registersList[rd] = (int)add(registersList[rn], immediate) + C_FLAG;
                 }
                 else
                 {
-                    registersList[rd] = (int)add(registersList[rn], registersList[immediate]);
+                    registersList[rd] = (int)add(registersList[rn], registersList[immediate]) + C_FLAG;
                 }
             }
             else if (instructionTypes == dataProcessingInstructions::SBC)
             {
                 if (iBit == 1)
                 {
-                    registersList[rd] = (int)sub(registersList[rn], immediate);
+                    registersList[rd] = (int)sub(registersList[rn], immediate) - C_FLAG;
                 }
                 else
                 {
-                    registersList[rd] = (int)sub(registersList[rn], registersList[immediate]);
+                    registersList[rd] = (int)sub(registersList[rn], registersList[immediate]) - C_FLAG;
                 }
             }
             cycles += 3;
