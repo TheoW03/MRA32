@@ -1,6 +1,6 @@
 # QtMRA32
 
-ARMv7 32 bit assembler
+ARMv7 32 bit emulator
 
 
 # Instructions
