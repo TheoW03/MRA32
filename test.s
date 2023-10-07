@@ -1,11 +1,15 @@
 MOV R0, 255
 MOV R1, 254
 
+
+ADD R3, R1, R0
 MUL R5, R1, R0
-CMP R1, R0
+# ADD R3, R1, R0
+CMP R3, R1
+
 BGT L1
 
-main:
-    MOV R4, 1
+L2:
+    MOV R5, 10
 L1:
-    MOV R3, 2
+    MOV R4, 0

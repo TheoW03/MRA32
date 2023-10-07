@@ -195,6 +195,7 @@ void emulate(vector<Instructions *> InstructionsList)
     {
         registersList[15] = i + 1;
         uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
+        cout << instruction << endl;
         cycles = 1;
 
 #pragma region CONDITIONS
@@ -279,6 +280,7 @@ void emulate(vector<Instructions *> InstructionsList)
             uint32_t rn = (instruction >> 16) & 0x0F;
             uint64_t immediate = instruction & 0xFFF;
             uint64_t canror = (instruction >> 27) & 1;
+
             int carry = 0;
             if (iBit == 1 && canror == 1)
             {
@@ -297,6 +299,7 @@ void emulate(vector<Instructions *> InstructionsList)
             }
             if (instructionTypes == dataProcessingInstructions::ADD) // ADD
             {
+
                 if (iBit == 1)
                 {
                     registersList[rd] = (int)add(registersList[rn], immediate, carry);
@@ -305,6 +308,7 @@ void emulate(vector<Instructions *> InstructionsList)
                 {
                     registersList[rd] = (int)add(registersList[rn], registersList[immediate], carry);
                 }
+
                 if (SBit == 1)
                 {
                     editCPSRFlags(registersList[rd]);
@@ -313,6 +317,7 @@ void emulate(vector<Instructions *> InstructionsList)
             }
             else if (instructionTypes == dataProcessingInstructions::SUB) // SUB
             {
+
                 if (iBit == 1)
                 {
                     registersList[rd] = (int)sub(registersList[rn], immediate, carry);
@@ -368,6 +373,7 @@ void emulate(vector<Instructions *> InstructionsList)
             }
             else if (instructionTypes == dataProcessingInstructions::AND)
             {
+
                 if (iBit == 1)
                 {
                     registersList[rd] = (int)registersList[rn] & immediate;
@@ -424,10 +430,14 @@ void emulate(vector<Instructions *> InstructionsList)
             uint32_t rs = (instruction >> 8) & 0x0F;
             uint32_t rm = instruction & 0x0F;
             cycles = 0;
+            cout << rd << endl;
+            cout << rn << endl;
+            cout << rm << endl;
 
             if (rd > 12)
             {
                 cout << "rd to big" << endl;
+                // continue;
                 exit(EXIT_FAILURE);
                 return;
             }

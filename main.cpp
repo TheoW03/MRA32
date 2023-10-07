@@ -50,10 +50,12 @@ int main(int argc, char const *argv[])
     //     cout << i << endl;
     //     cout << (i < 32 || a > 256) << endl;
     // } while (i < 32 && a > 256);
-
+    // unique_ptr<Multiply*> multiple(new Multiply);
+    // multiple->
     // // cout << rightRotate(a, i) << endl;
     // cout << subc(0b10010, 0b110) << endl;
     // cout << sub(0b10010, 0b110) << endl;
+
 
     emulate(parse(lex(readFile("test.s"))));
     // cout << mul(2, 1) << endl;

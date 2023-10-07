@@ -23,14 +23,10 @@ AND <Rd>, <Rn>, <Rm or const> # bitwise AND not logical AND
 also added comments with the "#" they follow the MIPS and numbers are like this
 
 
-# Conditinally Executed Instructions
+# Conditionally Executed Instructions
 
 
-will follow the nearest CMP in your code. aslong as you have a condition prefix in the
-
-so ADD becomes ADDEQ 
-
-the conditions I added so far
+this will follow the CPSR flags which set by adding a "S" prefix or CMP
 
 ```
 EQ <Rn>, <Rm or const> (Z_FLAG = 1)
