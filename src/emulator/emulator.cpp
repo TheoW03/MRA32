@@ -195,7 +195,6 @@ void emulate(vector<Instructions *> InstructionsList)
     {
         registersList[15] = i + 1;
         uint32_t instruction = encodedInstrtions[i]->encodedInstruction;
-        cout << instruction << endl;
         cycles = 1;
 
 #pragma region CONDITIONS
@@ -479,7 +478,7 @@ void emulate(vector<Instructions *> InstructionsList)
     }
 #pragma region REGISTERS
     cout << "" << endl;
-    cout << "REGISTERS" << endl;
+    cout << "REGISTERS FILE" << endl;
     cout << "===============" << endl;
     cout << "" << endl;
 

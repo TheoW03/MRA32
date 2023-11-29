@@ -12,4 +12,4 @@ BGT L1
 L2:
     MOV R5, 10
 L1:
-    MOV R4, 0
+    MOV R5, 0
